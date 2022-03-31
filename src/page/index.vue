@@ -1,0 +1,140 @@
+<template>
+    <div class="container">
+        <el-row class="header">
+            <!-- 导航栏 -->
+            <el-col :span="12" :offset="2">
+                <el-menu
+                :default-active="activeIndex"
+                mode="horizontal"
+                background-color= "#333"
+                text-color="#fff"
+                active-text-color="#fff"
+                router>
+                <el-menu-item index="/home">
+                    <i class="el-icon-s-home"></i>
+                    <span slot="title">首页</span>
+                </el-menu-item>
+                <el-menu-item index="/archives">
+                    <i class="el-icon-folder-opened"></i>
+                    <span slot="title">归档</span>
+                </el-menu-item>
+                <el-menu-item index="categories">
+                    <i class="el-icon-paperclip"></i>
+                    <span slot="title">分类</span>
+                </el-menu-item>
+                <el-menu-item index="tags">
+                    <i class="el-icon-price-tag"></i>
+                    <span slot="title">标签</span>
+                </el-menu-item>
+                <el-menu-item index="about">
+                    <i class="el-icon-user-solid"></i>
+                    <span slot="title">关于</span>
+                </el-menu-item>
+                </el-menu>
+            </el-col>
+            <!-- 全局搜索 -->
+            <el-col :span="4" class="global_search">
+                 <el-input placeholder="请输入内容" v-model="serachInfo" class="input-with-select">
+                    <el-button slot="append" icon="el-icon-search"></el-button>
+                </el-input>
+            </el-col>
+            <el-col :span="4">
+                <el-avatar style="float:right" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar>
+            </el-col>
+        </el-row>
+        <el-row>
+            <!-- 中央区域 -->
+            <el-col :span="20" :offset="2" :xl="{span:14, offset:5}">
+                <router-view></router-view>
+            </el-col>
+        </el-row>
+        <!-- 底部信息 -->
+        <div class="footer">
+            <el-row class="footer-info">
+                <el-col :span="6" :offset="3" class="contact">
+                    <div class="small-title">联系我</div>
+                    <div>邮箱：17374527@buaa.edu.cn</div>
+                    <div>QQ：910568227</div>
+                </el-col>
+                <el-col :span="12" class="about">
+                    <div class="small-title">Blog</div>
+                    <div>这是 <el-link href="#">小切</el-link> 的个人博客，用于分享学习笔记和个人心得。内容主要关于前后端开发、编程基础知识等。希望阅读的朋友能有所收获。</div>
+                </el-col>
+            </el-row>
+            <div class="copyright">
+                <span>Copyright © 2021~2022 | </span> <el-link target="_blank" href="https://beian.miit.gov.cn/#/Integrated/index">京ICP备2021039158号-1</el-link>
+            </div>
+            <div>
+                <span>Designed by 小切</span>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+export default {
+    name: 'index',
+    data() {
+        return {
+            activeIndex: '/home',
+            // 全局搜索框内容
+            serachInfo: '',
+        }
+    },
+}
+</script>
+
+<style lang="less" scoped>
+    .container{
+        height: 100%;
+    }
+    .header, .footer{
+        background-color: #333;
+    }
+    .el-menu{
+        border-bottom: 0;
+    }
+    .global_search{
+        margin-top: 10px;
+    }
+    .el-avatar{
+        float: right;
+        margin-right: 20px;
+        margin-top: 10px;
+        
+    }
+    .footer{
+        height: 200px;
+        width: 100%;
+        margin-top: 100px;
+        text-align: center;
+        color: #aaa;
+        font-size: 16px;
+        .el-link{
+            font-size: 16px;
+            color: rgb(243, 75, 75);
+        }
+        .footer-info{
+            padding-top: 20px;
+            font-size: 14px;
+            .contact{
+                border-right: 1px solid #555;
+            }
+            .about{
+                padding: 0 20px;
+            }
+        }
+        .copyright{
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+        .small-title{
+            color: #eee;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+    }
+    
+    
+</style>
