@@ -1,7 +1,7 @@
 // 导入自己需要的组件
 import { Form, FormItem, Input, Button, Menu, MenuItem, Row, Col,
    Avatar, Card, Link, Pagination, Tag, Timeline, TimelineItem, Radio,
-   Select, Option, Checkbox, Upload} from 'element-ui'
+   Select, Option, Checkbox, Upload, Table, TableColumn} from 'element-ui'
 const element = {
   install: function (Vue) {
     Vue.use(Form)
@@ -24,6 +24,8 @@ const element = {
     Vue.use(Option)
     Vue.use(Checkbox)
     Vue.use(Upload)
+    Vue.use(Table)
+    Vue.use(TableColumn)
   }
 }
 export default element
