@@ -1,8 +1,13 @@
 <template>
     <div class="container">
         <el-row class="header">
+            <el-col :span="4" class="admin-logo">
+                <div class="logo-content">
+                    博客后台管理系统
+                </div>
+            </el-col>
             <!-- 导航栏 -->
-            <el-col :span="12" :offset="4">
+            <el-col :span="12">
                 <el-menu
                 :default-active="activeIndex"
                 mode="horizontal"
@@ -116,5 +121,13 @@ export default {
             font-weight: bold;
             margin-bottom: 5px;
         }
+    }
+    .logo-content{
+        text-align: center;
+        color: #409eff;
+        font-size: 20px;
+        font-weight: bold;
+        padding: 15px 0;
+        height: 100%;
     }
 </style>
