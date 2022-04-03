@@ -70,9 +70,10 @@ export default {
                         return
                     }
                     this.$message.success('登录成功！')
+                    
                     // 登录成功时保存服务端下发的token
                     window.sessionStorage.setItem('token', res.data.token)
-                    this.$router.push('/manage')
+                    this.$router.push(`/blogAdmin/${res.data.user.id}/manage`)
                 }
             })
         }

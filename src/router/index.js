@@ -57,17 +57,17 @@ const router = new VueRouter({
             component: login,
         },
         {
-            path: '/blogAdmin',
-            redirect: '/manage',
+            // 用户id作为路径参数
+            path: '/blogAdmin/:id',
             component: blogAdmin,
             children: [
                 {
-                    path: '/publish',
+                    path: 'publish',
                     component: publish,
                     meta: 'needAuth'
                 },
                 {
-                    path: '/manage',
+                    path: 'manage',
                     component: manage,
                     meta: 'needAuth'
                 },

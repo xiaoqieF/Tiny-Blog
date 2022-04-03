@@ -1,7 +1,8 @@
 // 导入自己需要的组件
 import { Form, FormItem, Input, Button, Menu, MenuItem, Row, Col,
   Avatar, Card, Link, Pagination, Tag, Timeline, TimelineItem, Radio,
-  Select, Option, Checkbox, Upload, Table, TableColumn, Message} from 'element-ui'
+  Select, Option, Checkbox, Upload, Table, TableColumn, Message, Dropdown, 
+  DropdownMenu,DropdownItem} from 'element-ui'
 import Vue from 'vue'
 
 Vue.prototype.$message = Message
@@ -29,6 +30,9 @@ const element = {
     Vue.use(Upload)
     Vue.use(Table)
     Vue.use(TableColumn)
+    Vue.use(Dropdown)
+    Vue.use(DropdownItem)
+    Vue.use(DropdownMenu)
   }
 }
 export default element

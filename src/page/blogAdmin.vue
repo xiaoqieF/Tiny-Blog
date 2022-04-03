@@ -15,20 +15,34 @@
                 text-color="#fff"
                 active-text-color="#fff"
                 router>
-                <el-menu-item index="/publish">
-                    <i class="el-icon-s-home"></i>
-                    <span slot="title">发布</span>
-                </el-menu-item>
-                <el-menu-item index="/manage">
-                    <i class="el-icon-folder-opened"></i>
-                    <span slot="title">管理</span>
-                </el-menu-item>
+                    <!-- 这里使用了路由路径参数，其值为用户的id -->
+                    <el-menu-item :index="`/blogAdmin/${this.$route.params.id}/publish`">
+                        <i class="el-icon-s-home"></i>
+                        <span slot="title">发布</span>
+                    </el-menu-item>
+                    <el-menu-item :index="`/blogAdmin/${this.$route.params.id}/manage`">
+                        <i class="el-icon-folder-opened"></i>
+                        <span slot="title">管理</span>
+                    </el-menu-item>
                 
                 </el-menu>
             </el-col>
             <!-- 头像 -->
-            <el-col :span="4">
-                <el-avatar style="float:right" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar>
+            <el-col :span="4" :offset="2">
+                <!-- <el-avatar style="float:right" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar> -->
+                <div class="header-right">
+                    <el-dropdown @command="handleCommand">
+                    <span>
+                        <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar>
+                    </span>
+                    <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item command="home">首页</el-dropdown-item>
+                        <el-dropdown-item command="modify">修改个人信息</el-dropdown-item>
+                        <el-dropdown-item command="logOut">注销</el-dropdown-item>
+                    </el-dropdown-menu>
+                    </el-dropdown>
+                    <div class="welcome-user">欢迎你：{{ this.userInfo.nickname }}</div>
+                </div>
             </el-col>
         </el-row>
         <el-row>
@@ -63,9 +77,37 @@
 <script>
 export default {
     name: 'blogAdmin',
+    created() {
+        this.getUserInfo()
+    },
     data() {
         return {
             activeIndex: '/manage',
+            userInfo: {},
+        }
+    },
+    methods: {
+        // 头像下拉菜单回调
+        handleCommand(command) {
+            console.log(command)
+            if (command === 'home') {
+                this.$router.push('/home')
+            } else if (command === 'logOut') {
+                window.sessionStorage.removeItem('token')
+                this.$router.push('/admin')
+            } else if (command === 'modify') {
+
+            }
+        },
+        // 获取用户信息
+        async getUserInfo() {
+            const {data: res} = await this.$http.get(`private/user/${this.$route.params.id}`)
+            if (res.meta.status !== 200) {
+                this.$message.error("获取用户信息失败：" + res.meta.msg)
+                return
+            }
+            console.log(res.data)
+            this.userInfo = res.data
         }
     },
 }
@@ -129,5 +171,15 @@ export default {
         font-weight: bold;
         padding: 15px 0;
         height: 100%;
+    }
+    .header-right{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .welcome-user{
+            font-size: 18px;
+            padding-top: 5px;
+            color: #eee;
+        }   
     }
 </style>

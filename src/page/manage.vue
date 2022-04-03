@@ -214,7 +214,7 @@ export default {
             }
             this.$message.success('删除标签成功！')
             this.getAllTags()
-        }
+        },
     },
 }
 </script>
