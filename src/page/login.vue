@@ -38,7 +38,7 @@ export default {
     data() {
         return {
             loginForm: {
-                username: 'admin',
+                username: 'xiaoqie',
                 password: '123456',
             },
             // 表单验证规则
@@ -57,11 +57,24 @@ export default {
     methods: {
         // 重置表单
         resetForm(){
-            this.$refs.loginFormRef.resetFields();
+            this.$refs.loginFormRef.resetFields()
         },
         // 登录
         login() {
-            
+            this.$refs.loginFormRef.validate(async valid => {
+                if (valid) {
+                    const {data: res} = await this.$http.post('/public/login', this.loginForm)
+                    console.log(res)
+                    if (res.meta.status !== 200) {
+                        this.$message.error('登录失败：' + res.meta.msg)
+                        return
+                    }
+                    this.$message.success('登录成功！')
+                    // 登录成功时保存服务端下发的token
+                    window.sessionStorage.setItem('token', res.data.token)
+                    this.$router.push('/manage')
+                }
+            })
         }
     },
 }

@@ -58,20 +58,31 @@ const router = new VueRouter({
         },
         {
             path: '/blogAdmin',
-            redirect: '/publish',
+            redirect: '/manage',
             component: blogAdmin,
             children: [
                 {
                     path: '/publish',
                     component: publish,
+                    meta: 'needAuth'
                 },
                 {
                     path: '/manage',
                     component: manage,
+                    meta: 'needAuth'
                 },
             ]
         },
     ]
+})
+
+// 路由守卫
+router.beforeEach((to, from, next) => {
+    if (to.meta === 'needAuth' && !window.sessionStorage.getItem('token')) {
+        return next('/admin')
+    } else {
+        return next()
+    }
 })
 
 export default router;

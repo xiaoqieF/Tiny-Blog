@@ -65,7 +65,7 @@ export default {
     name: 'blogAdmin',
     data() {
         return {
-            activeIndex: '/publish',
+            activeIndex: '/manage',
         }
     },
 }
