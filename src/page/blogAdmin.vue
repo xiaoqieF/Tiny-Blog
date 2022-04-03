@@ -33,11 +33,13 @@
                 <div class="header-right">
                     <el-dropdown @command="handleCommand">
                     <span>
-                        <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar>
+                        <el-avatar v-if="userInfo.avatar" :src="userInfo.avatar"></el-avatar>
+                        <el-avatar v-else src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar>
                     </span>
                     <el-dropdown-menu slot="dropdown">
                         <el-dropdown-item command="home">首页</el-dropdown-item>
                         <el-dropdown-item command="modify">修改个人信息</el-dropdown-item>
+                        <el-dropdown-item command="upload">上传头像</el-dropdown-item>
                         <el-dropdown-item command="logOut">注销</el-dropdown-item>
                     </el-dropdown-menu>
                     </el-dropdown>
@@ -71,6 +73,51 @@
                 <span>Designed by 小切</span>
             </div>
         </div>
+
+        <!-- 修改用户信息对话框 -->
+        <el-dialog
+        title="修改个人信息"
+        :visible.sync="modifyDialogVisible"
+        width="50%"
+        @close="handleModifyDialogClose">
+            
+            <el-form :model="userInfo" :rules="userFormrules" ref="userFormRef" label-width="100px">
+                <el-form-item label="用户名" prop="username">
+                    <el-input disabled v-model="userInfo.username"></el-input>
+                </el-form-item>
+                <el-form-item label="昵称" prop="nickname">
+                    <el-input v-model="userInfo.nickname"></el-input>
+                </el-form-item>
+                <el-form-item label="密码" prop="password">
+                    <el-input v-model="userInfo.password"></el-input>
+                </el-form-item>
+                <el-form-item label="邮箱" prop="email">
+                    <el-input v-model="userInfo.email"></el-input>
+                </el-form-item>
+            </el-form>
+
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="modifyDialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="modifyUserInfo">确 定</el-button>
+            </span>
+        </el-dialog>
+
+        <el-dialog
+        title="上传头像"
+        :visible.sync="uploadDialogVisible"
+        width="50%">
+            <el-upload
+            class="avatar-uploader"
+            :action="uploadUrl"
+            :show-file-list="false"
+            :on-success="handleAvatarSuccess"
+            :before-upload="beforeAvatarUpload"
+            :headers="uploadHeader">
+                <img v-if="userInfo.avatar" :src="userInfo.avatar" class="avatar">
+                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+            </el-upload>
+        </el-dialog>
+
     </div>
 </template>
 
@@ -81,9 +128,41 @@ export default {
         this.getUserInfo()
     },
     data() {
+        // 自定义邮箱验证规则
+        var checkEmail = (rule, value, callback) => {
+            var reg = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/;
+            if (reg.test(value)){
+                callback();
+            }
+            callback(new Error('邮箱格式错误'));
+        };
         return {
-            activeIndex: '/manage',
+            activeIndex: `/blogAdmin/${this.$route.params.id}/manage`,
             userInfo: {},
+            // 修改用户信息对话框
+            modifyDialogVisible: false,
+            userFormrules: {
+                nickname: [
+                    { required: true, message: '请输入昵称', trigger: 'blur' },
+                    { min: 1, max: 5, message: '长度在 1 到 5 个字符', trigger: 'blur' }
+                ],
+                password: [
+                    { required: true, message: '请输入密码', trigger: 'blur' },
+                    { min: 6, max: 15, message: '长度在 6 到 15 个字符', trigger: 'blur' }
+                ],
+                email: [
+                    { required: true, message: '请输入邮箱', trigger: 'blur' },
+                    {validator: checkEmail, trigger: 'blur'},
+                ],
+            },
+            // 上传用户头像对话框
+            uploadDialogVisible: false,
+            // 头像上传地址
+            uploadUrl: 'http://localhost:8082/private/user/upload',
+            // 头像上传时添加token头部
+            uploadHeader: {
+                Authorization: window.sessionStorage.getItem('token')
+            }
         }
     },
     methods: {
@@ -96,7 +175,9 @@ export default {
                 window.sessionStorage.removeItem('token')
                 this.$router.push('/admin')
             } else if (command === 'modify') {
-
+                this.modifyDialogVisible = true
+            } else if (command === 'upload') {
+                this.uploadDialogVisible = true
             }
         },
         // 获取用户信息
@@ -108,7 +189,51 @@ export default {
             }
             console.log(res.data)
             this.userInfo = res.data
+        },
+        // 取消修改个人信息
+        handleModifyDialogClose() {
+            this.getUserInfo()
+            this.modifyDialogVisible = false
+            this.$refs.userFormRef.resetFields()
+        },
+        // 确定修改个人信息
+        modifyUserInfo() {
+            this.$refs.userFormRef.validate(async valid => {
+                if (!valid) {
+                    return
+                }
+                this.uploadUserInfo()
+                this.$message.success('更新个人信息成功！')
+                this.modifyDialogVisible = false
+            })
+        },
+        handleAvatarSuccess(res, file) {
+            console.log(res)
+            this.userInfo.avatar = res.path
+            this.uploadUserInfo()
+            this.getUserInfo()
+        },
+        // 更新用户全部信息
+        async uploadUserInfo() {
+            const {data: res} = await this.$http.put(`private/user/${this.$route.params.id}`, this.userInfo)
+            if (res.meta.status !== 200) {
+                return this.$message.error('更新个人信息失败：' + res.meta.msg)
+            }
+            this.$message.success('更新个人信息成功！')
+        },
+        beforeAvatarUpload(file) {
+            const isJPG = file.type === 'image/jpeg'
+            const isLt2M = file.size / 1024 / 1024 < 2
+
+            if (!isJPG) {
+                this.$message.error('上传头像图片只能是 JPG 格式!')
+            }
+            if (!isLt2M) {
+                this.$message.error('上传头像图片大小不能超过 2MB!')
+            }
+            return isJPG && isLt2M
         }
+
     },
 }
 </script>
@@ -177,9 +302,33 @@ export default {
         justify-content: center;
         align-items: center;
         .welcome-user{
-            font-size: 18px;
+            font-size: 16px;
             padding-top: 5px;
             color: #eee;
         }   
     }
+    .avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .avatar-uploader .el-upload:hover {
+    border-color: #409EFF;
+  }
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+  }
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
+  }
+    
 </style>

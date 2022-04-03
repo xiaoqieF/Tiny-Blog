@@ -2,7 +2,7 @@
 import { Form, FormItem, Input, Button, Menu, MenuItem, Row, Col,
   Avatar, Card, Link, Pagination, Tag, Timeline, TimelineItem, Radio,
   Select, Option, Checkbox, Upload, Table, TableColumn, Message, Dropdown, 
-  DropdownMenu,DropdownItem} from 'element-ui'
+  DropdownMenu, DropdownItem, Dialog} from 'element-ui'
 import Vue from 'vue'
 
 Vue.prototype.$message = Message
@@ -33,6 +33,7 @@ const element = {
     Vue.use(Dropdown)
     Vue.use(DropdownItem)
     Vue.use(DropdownMenu)
+    Vue.use(Dialog)
   }
 }
 export default element
