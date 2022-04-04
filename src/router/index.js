@@ -12,6 +12,7 @@ const about = () => import('../page/about')
 const blogAdmin = () => import('../page/blogAdmin')
 const publish = () => import('../page/publish')
 const manage = () => import('../page/manage')
+const edit = () => import('../page/edit')
 
 
 Vue.use(VueRouter)
@@ -69,6 +70,11 @@ const router = new VueRouter({
                 {
                     path: 'manage',
                     component: manage,
+                    meta: 'needAuth'
+                },
+                {
+                    path: 'edit',
+                    component: edit,
                     meta: 'needAuth'
                 },
             ]

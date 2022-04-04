@@ -8,16 +8,45 @@
         :data="blogList"
         stripe
         style="width: 100%">
-            <el-table-column
-            type="index"
-            width="50">
+            <el-table-column type="index" width="50"></el-table-column>
+            <el-table-column prop="title" label="标题" ></el-table-column>
+            <el-table-column prop="createTime" label="创建时间"></el-table-column>
+            <el-table-column prop="updateTime" label="更新时间" ></el-table-column>
+            <el-table-column prop="user.nickname" label="作者" ></el-table-column>
+            <el-table-column prop="type.name" label="分类" >
+                <template slot-scope="scope">
+                    <el-tag 
+                    size="mini" >
+                    {{ scope.row.type.name }}
+                    </el-tag>
+                </template>
             </el-table-column>
-            <el-table-column
-            prop="date"
-            label="日期"
-            width="180">
+            <el-table-column label="标签" width="250px">
+                <template slot-scope="scope">
+                    <el-tag 
+                    type="success" 
+                    size="mini" 
+                    v-for="item in scope.row.tags" 
+                    :key="item.id" 
+                    style="margin:5px">
+                    {{ item.name }}
+                    </el-tag>
+                </template>
             </el-table-column>
         </el-table>
+
+        <div class="pagin">
+            <!-- 分页 -->
+            <el-pagination
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="blogQuery.pageNum"
+            :page-sizes="[5, 10, 15, 20]"
+            :page-size="blogQuery.pageSize"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="totalBlogs">
+            </el-pagination>
+        </div>
         <!-- 分类和标签 -->
         <div class="cate-tag">
             <div class="title">
@@ -85,30 +114,20 @@ export default {
     created(){
         this.getAllCates()
         this.getAllTags()
+        this.getAllBlogs()
     },
     data() {
         return {
+            blogQuery: {
+                pageNum: 1,
+                pageSize: 5,
+            },
+            totalBlogs: 0,
             // 全部分类列表
             cateList: [],
             // 全部标签列表
             tagList:[],
-            blogList: [{
-                date: '2016-05-02',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1518 弄'
-                }, {
-                date: '2016-05-04',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1517 弄'
-                }, {
-                date: '2016-05-01',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1519 弄'
-                }, {
-                date: '2016-05-03',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1516 弄'
-            }],
+            blogList: [],
             // 分类添加tag框
             cateInputVisible: false,
             cateInputValue: '',
@@ -124,6 +143,8 @@ export default {
             console.log(res)
             if (res.meta.status === 200) {
                 this.cateList = res.data
+            } else {
+                this.$message.error('获取分类数据失败！')
             }
         },
         // 获取所有标签
@@ -132,6 +153,21 @@ export default {
             console.log(res)
             if (res.meta.status === 200) {
                 this.tagList = res.data
+            } else {
+                this.$message.error('获取标签数据失败！')
+            }
+        },
+        // 获取所有博客
+        async getAllBlogs() {
+            const {data: res} = await this.$http.get('private/blog', {
+                params: this.blogQuery,
+            })
+            console.log(res)
+            if (res.meta.status === 200) {
+                this.blogList = res.data.blogList
+                this.totalBlogs = res.data.total
+            } else {
+                this.$message.error('获取博客数据失败:', res.meta.msg)
             }
         },
         // 添加分类框确认回调
@@ -215,6 +251,15 @@ export default {
             this.$message.success('删除标签成功！')
             this.getAllTags()
         },
+        handleSizeChange(newSize) {
+            this.blogQuery.pageSize = newSize
+            this.getAllBlogs()
+        },
+        handleCurrentChange(newPage) {
+            this.blogQuery.pageNum = newPage
+            this.getAllBlogs()
+        },
+
     },
 }
 </script>
@@ -248,6 +293,13 @@ export default {
         }
         .input-new-tag{
             width: 90px;
+        }
+    }
+    .pagin{
+        display: flex;
+        justify-content: center;
+        .el-pagination{
+            margin-top: 20px;
         }
     }
     

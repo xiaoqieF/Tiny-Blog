@@ -16,11 +16,15 @@
                 active-text-color="#fff"
                 router>
                     <!-- 这里使用了路由路径参数，其值为用户的id -->
-                    <el-menu-item :index="`/blogAdmin/${this.$route.params.id}/publish`">
+                    <el-menu-item 
+                    :index="`/blogAdmin/${this.$route.params.id}/publish`"
+                    @click="handleMenuItemClick('publish')">
                         <i class="el-icon-s-home"></i>
                         <span slot="title">发布</span>
                     </el-menu-item>
-                    <el-menu-item :index="`/blogAdmin/${this.$route.params.id}/manage`">
+                    <el-menu-item 
+                    :index="`/blogAdmin/${this.$route.params.id}/manage`"
+                    @click="handleMenuItemClick('manage')">
                         <i class="el-icon-folder-opened"></i>
                         <span slot="title">管理</span>
                     </el-menu-item>
@@ -81,7 +85,7 @@
         width="50%"
         @close="handleModifyDialogClose">
             
-            <el-form :model="userInfo" :rules="userFormrules" ref="userFormRef" label-width="100px">
+            <el-form :model="userInfo" :rules="userFormRules" ref="userFormRef" label-width="100px">
                 <el-form-item label="用户名" prop="username">
                     <el-input disabled v-model="userInfo.username"></el-input>
                 </el-form-item>
@@ -102,6 +106,7 @@
             </span>
         </el-dialog>
 
+        <!-- 上传头像对话框 -->
         <el-dialog
         title="上传头像"
         :visible.sync="uploadDialogVisible"
@@ -126,6 +131,8 @@ export default {
     name: 'blogAdmin',
     created() {
         this.getUserInfo()
+        const path = window.sessionStorage.getItem('activePath')
+        this.activeIndex = path ? `/blogAdmin/${this.$route.params.id}/${path}` : `/blogAdmin/${this.$route.params.id}/manage`
     },
     data() {
         // 自定义邮箱验证规则
@@ -137,11 +144,11 @@ export default {
             callback(new Error('邮箱格式错误'));
         };
         return {
-            activeIndex: `/blogAdmin/${this.$route.params.id}/manage`,
+            activeIndex: "",
             userInfo: {},
             // 修改用户信息对话框
             modifyDialogVisible: false,
-            userFormrules: {
+            userFormRules: {
                 nickname: [
                     { required: true, message: '请输入昵称', trigger: 'blur' },
                     { min: 1, max: 5, message: '长度在 1 到 5 个字符', trigger: 'blur' }
@@ -193,7 +200,6 @@ export default {
         // 取消修改个人信息
         handleModifyDialogClose() {
             this.getUserInfo()
-            this.modifyDialogVisible = false
             this.$refs.userFormRef.resetFields()
         },
         // 确定修改个人信息
@@ -202,8 +208,8 @@ export default {
                 if (!valid) {
                     return
                 }
-                this.uploadUserInfo()
-                this.$message.success('更新个人信息成功！')
+                // 注意，这里要使用await，不然可能更新请求还未上传就触发了对话框关闭事件
+                await this.uploadUserInfo()
                 this.modifyDialogVisible = false
             })
         },
@@ -211,7 +217,6 @@ export default {
             console.log(res)
             this.userInfo.avatar = res.path
             this.uploadUserInfo()
-            this.getUserInfo()
         },
         // 更新用户全部信息
         async uploadUserInfo() {
@@ -221,6 +226,7 @@ export default {
             }
             this.$message.success('更新个人信息成功！')
         },
+        // 头像文件上传前验证
         beforeAvatarUpload(file) {
             const isJPG = file.type === 'image/jpeg'
             const isLt2M = file.size / 1024 / 1024 < 2
@@ -232,6 +238,10 @@ export default {
                 this.$message.error('上传头像图片大小不能超过 2MB!')
             }
             return isJPG && isLt2M
+        },
+        // 点击导航栏时将当前默认激活路径存入session
+        handleMenuItemClick(path) {
+            window.sessionStorage.setItem('activePath', path)
         }
 
     },

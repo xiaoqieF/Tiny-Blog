@@ -3,18 +3,18 @@
         <div class="title">
             发布博客
         </div>
-        <el-form ref="form" :model="blog">
-            <el-form-item>
+        <el-form ref="blogFormRef" :model="blog" :rules="blogFormRules">
+            <el-form-item prop="title">
                 <el-input placeholder="请输入标题" v-model="blog.title">
                     <el-select v-model="blog.flag" slot="prepend" placeholder="请选择">
-                        <el-option label="原创" value="1"></el-option>
-                        <el-option label="转载" value="2"></el-option>
-                        <el-option label="翻译" value="3"></el-option>
+                        <el-option label="原创" value="原创"></el-option>
+                        <el-option label="转载" value="转载"></el-option>
+                        <el-option label="翻译" value="翻译"></el-option>
                     </el-select>
                 </el-input>
             </el-form-item>
             <!-- 博客摘要 -->
-            <el-form-item>
+            <el-form-item prop="description">
                 <el-input
                 type="textarea"
                 autosize
@@ -23,7 +23,7 @@
                 </el-input>
             </el-form-item>
             <!-- markdown编辑器 -->
-            <el-form-item>
+            <el-form-item prop="content">
                 <mavon-editor v-model="blog.content"/>
             </el-form-item>
             <el-form-item>
@@ -33,95 +33,169 @@
                 <el-checkbox label="转载声明" v-model="blog.shareStatement"></el-checkbox>
             </el-form-item>
             <!-- 分类和标签 -->
-            <el-form-item class="inline-item">
+            <el-form-item class="inline-item" prop="typeId">
                 <el-select 
-                v-model="blog.cateId" 
+                v-model="blog.typeId" 
                 clearable 
                 placeholder="请选择分类" 
                 style="width:260px">
                     <el-option
-                    v-for="item in options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
+                    v-for="item in cateList"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id">
                     </el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item class="inline-item">
+            <el-form-item class="inline-item" prop="tagId">
                 <el-select 
                 v-model="blog.tagId" 
                 multiple 
                 placeholder="请选择标签"
-                style="width:260px">
+                style="width:460px">
                     <el-option
-                    v-for="item in options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
+                    v-for="item in tagList"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id">
                     </el-option>
                 </el-select>
             </el-form-item>
         </el-form>
+        <!-- 上传文章首页图 -->
         <el-upload
         class="upload-first-picture"
         :action="uploadUrl"
         :on-preview="handlePreview"
         :on-remove="handleRemove"
+        :on-success="handleSuccess"
         :file-list="fileList"
+        :headers="uploadHeader"
         list-type="picture">
             <el-button size="small" type="primary">点击上传文章首图</el-button>
         </el-upload>
         <div class="form-confirm">
-            <el-button type="primary" size="small">保存</el-button>
-            <el-button type="primary" size="small">发布</el-button>
+            <el-button type="primary" size="small" @click="saveBlog">保存</el-button>
+            <el-button type="primary" size="small" @click="publishBlog">发布</el-button>
         </div>
+
+        <!-- 预览图片对话框 -->
+        <el-dialog
+        title="预览文章首图"
+        :visible.sync="previewDialogVisible"
+        width="50%">
+            <img :src="blog.firstPicture" alt="首图" style="width:100%">
+        </el-dialog>
     </el-card>
 </template>
 
 <script>
 export default {
     name: 'publish',
+    created() {
+        this.getAllCates()
+        this.getAllTags()
+    },
     data() {
         return {
             blog: {
                 title: '',
-                flag: '',
+                flag: '原创',
                 content: '',
                 description: '',
                 appreciation: false,
                 commentEnable: false,
                 recommend: false,
                 shareStatement: false,
-                cateId: '',
+                firstPicture: '',
+                typeId: '',
+                userId: this.$route.params.id,
                 tagId:[],
+                published: false,
             },
             fileList:[],
             // 文件上传地址
-            uploadUrl: '#',
-            options: [{
-                value: '选项1',
-                label: '黄金糕'
-                }, {
-                value: '选项2',
-                label: '双皮奶'
-                }, {
-                value: '选项3',
-                label: '蚵仔煎'
-                }, {
-                value: '选项4',
-                label: '龙须面'
-                }, {
-                value: '选项5',
-                label: '北京烤鸭'
-            }],
+            uploadUrl: "http://localhost:8082/private/blog/upload",
+            // 上传文件时的头部
+            uploadHeader: {
+                Authorization: window.sessionStorage.getItem('token')
+            },
+            // 分类列表数据
+            cateList: [],
+            // 标签列表数据
+            tagList: [],
+            // 博客验证规则
+            blogFormRules: {
+                title: [
+                    { required: true, message: '请输入标题', trigger: 'blur' },
+                ],
+                description: [
+                    { required: true, message: '请输入博客摘要', trigger: 'blur' },
+                ],
+                content: [
+                    { required: true, message: '博客内容不能为空' },
+                ],
+                typeId: [
+                    { required: true, message: '必须选择分类', trigger: 'blur' },
+                ],
+                tagId: [
+                    { required: true, message: '必须选择标签', trigger: 'blur' },
+                ],
+            },
+            previewDialogVisible: false,
+
         }
     },
     methods: {
         handleRemove(file, fileList){
             console.log(file, fileList)
         },
+        handleSuccess(response, file) {
+            console.log(response)
+            this.blog.firstPicture = response.path
+        },
         handlePreview(file) {
             console.log(file)
+            this.previewDialogVisible = true;
+        },
+        // 获取所有分类
+        async getAllCates() {
+            const {data: res} = await this.$http.get('public/categories')
+            console.log(res)
+            if (res.meta.status === 200) {
+                this.cateList = res.data
+            }
+        },
+        // 获取所有标签
+        async getAllTags() {
+            const {data: res} = await this.$http.get('public/tags')
+            console.log(res)
+            if (res.meta.status === 200) {
+                this.tagList = res.data
+            }
+        },
+        async saveBlog() {
+            this.blog.published = false
+            this.uploadBlog()
+        },
+        publishBlog() {
+            this.blog.published = true
+            this.uploadBlog()
+        },
+        uploadBlog() {
+            this.$refs.blogFormRef.validate(async valid => {
+                if (!valid) {
+                    this.$message.error("请填写必要字段！")
+                    return
+                }
+                const {data: res} = await this.$http.post('/private/blog', this.blog)
+                console.log(res)
+                if (res.meta.status !== 200) {
+                    this.$message.error("上传失败：", res.meta.msg)
+                    return
+                }
+                this.$message.success("上传成功！")
+            })
         }
     }
 }
@@ -144,6 +218,7 @@ export default {
     .form-confirm{
         display: flex;
         justify-content: flex-end;
+        margin-top: 20px;
     }
     .inline-item{
         display: inline-block;
