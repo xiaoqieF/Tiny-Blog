@@ -137,6 +137,7 @@ export default {
     methods: {
         handleRemove(file, fileList){
             console.log(file, fileList)
+            this.blog.firstPicture = ''
         },
         handleSuccess(response, file) {
             console.log(response)
@@ -167,6 +168,9 @@ export default {
             console.log(this.$route.params)
             const {data: res} = await this.$http.get(`/public/blog/${this.$route.params.blogId}`)
             console.log(res)
+            if (res.meta.status !== 200) {
+                return this.$message.error('获取博客信息失败：', res.meta.msg)
+            }
             this.blog = res.data
         },
         async saveBlog() {
