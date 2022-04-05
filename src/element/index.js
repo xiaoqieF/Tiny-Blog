@@ -2,10 +2,12 @@
 import { Form, FormItem, Input, Button, Menu, MenuItem, Row, Col,
   Avatar, Card, Link, Pagination, Tag, Timeline, TimelineItem, Radio,
   Select, Option, Checkbox, Upload, Table, TableColumn, Message, Dropdown, 
-  DropdownMenu, DropdownItem, Dialog} from 'element-ui'
+  DropdownMenu, DropdownItem, Dialog, MessageBox} from 'element-ui'
 import Vue from 'vue'
 
 Vue.prototype.$message = Message
+Vue.prototype.$confirm = MessageBox.confirm
+
 const element = {
   install: function (Vue) {
     Vue.use(Form)

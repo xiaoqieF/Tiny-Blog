@@ -195,6 +195,7 @@ export default {
                     return
                 }
                 this.$message.success("上传成功！")
+                this.$router.push(`/blogAdmin/${this.$route.params.id}/manage`)
             })
         }
     }

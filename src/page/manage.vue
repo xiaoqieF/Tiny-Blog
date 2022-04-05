@@ -10,13 +10,21 @@
         style="width: 100%">
             <el-table-column type="index" width="50"></el-table-column>
             <el-table-column prop="title" label="标题" ></el-table-column>
-            <el-table-column prop="createTime" label="创建时间"></el-table-column>
-            <el-table-column prop="updateTime" label="更新时间" ></el-table-column>
-            <el-table-column prop="user.nickname" label="作者" ></el-table-column>
-            <el-table-column prop="type.name" label="分类" >
+            <el-table-column label="创建时间" width="120px">
+                <template slot-scope="scope">
+                    {{ scope.row.createTime | dateFormat }}
+                </template>
+            </el-table-column>
+            <el-table-column label="更新时间" width="120px">
+                <template slot-scope="scope">
+                    {{ scope.row.updateTime | dateFormat }}
+                </template>
+            </el-table-column>
+            <el-table-column prop="user.nickname" label="作者" width="60px"></el-table-column>
+            <el-table-column label="分类" width="50px">
                 <template slot-scope="scope">
                     <el-tag 
-                    size="mini" >
+                    size="mini">
                     {{ scope.row.type.name }}
                     </el-tag>
                 </template>
@@ -31,6 +39,21 @@
                     style="margin:5px">
                     {{ item.name }}
                     </el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column label="是否发表" >
+                <template slot-scope="scope">
+                    <el-tag v-if="scope.row.published" size="mini" type="success">是</el-tag>
+                    <el-tag v-else size="mini" type="danger">否</el-tag>
+                </template>
+            </el-table-column>
+            <!-- 编辑和删除博客操作栏 -->
+            <el-table-column label="操作" width="140px">
+                <!-- 通过作用域插槽获取组件内部数据 -->
+                <template slot-scope="scope">
+                    <!-- 修改、删除和分配角色按钮 -->
+                    <el-button type="primary" icon="el-icon-edit" size="mini" @click="editBlog(scope.row.id)"></el-button>
+                    <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteBlog(scope.row.id)"></el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -234,6 +257,7 @@ export default {
             this.tagInputVisible = false
             this.tagInputValue = ''
         },
+        // 显示添加标签的输入框
         showTagInput() {
             this.tagInputVisible = true
             this.$nextTick(_ => {
@@ -251,15 +275,38 @@ export default {
             this.$message.success('删除标签成功！')
             this.getAllTags()
         },
+        // 分页页面大小变化后重新获取数据
         handleSizeChange(newSize) {
             this.blogQuery.pageSize = newSize
             this.getAllBlogs()
         },
+        // 当前选择页面变化后重新获取数据
         handleCurrentChange(newPage) {
             this.blogQuery.pageNum = newPage
             this.getAllBlogs()
         },
-
+        // 删除博客
+        async deleteBlog(id) {
+            console.log(id)
+            const result = await this.$confirm('此操作将永久删除该博客 是否继续?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+            }).catch(err => err);
+            if (result !== 'confirm') {
+                return this.$message.info('已取消删除操作！');
+            }
+            const {data: res} = await this.$http.delete(`/private/blog/${id}`);
+            if (res.meta.status !== 200) {
+                return this.$message.error('删除博客失败：', res.meta.msg);
+            }
+            this.getAllBlogs()
+            this.$message.success('删除博客成功！');
+        },
+        editBlog(id) {
+            console.log(id)
+            this.$router.push(`/blogAdmin/${this.$route.params.id}/edit/${id}`)
+        }
     },
 }
 </script>

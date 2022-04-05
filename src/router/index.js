@@ -73,7 +73,7 @@ const router = new VueRouter({
                     meta: 'needAuth'
                 },
                 {
-                    path: 'edit',
+                    path: 'edit/:blogId',
                     component: edit,
                     meta: 'needAuth'
                 },

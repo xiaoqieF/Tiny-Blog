@@ -17,14 +17,12 @@
                 router>
                     <!-- 这里使用了路由路径参数，其值为用户的id -->
                     <el-menu-item 
-                    :index="`/blogAdmin/${this.$route.params.id}/publish`"
-                    @click="handleMenuItemClick('publish')">
+                    :index="`/blogAdmin/${this.$route.params.id}/publish`">
                         <i class="el-icon-s-home"></i>
                         <span slot="title">发布</span>
                     </el-menu-item>
                     <el-menu-item 
-                    :index="`/blogAdmin/${this.$route.params.id}/manage`"
-                    @click="handleMenuItemClick('manage')">
+                    :index="`/blogAdmin/${this.$route.params.id}/manage`">
                         <i class="el-icon-folder-opened"></i>
                         <span slot="title">管理</span>
                     </el-menu-item>
@@ -131,8 +129,7 @@ export default {
     name: 'blogAdmin',
     created() {
         this.getUserInfo()
-        const path = window.sessionStorage.getItem('activePath')
-        this.activeIndex = path ? `/blogAdmin/${this.$route.params.id}/${path}` : `/blogAdmin/${this.$route.params.id}/manage`
+        this.activeIndex = this.$route.path
     },
     data() {
         // 自定义邮箱验证规则
@@ -239,12 +236,15 @@ export default {
             }
             return isJPG && isLt2M
         },
-        // 点击导航栏时将当前默认激活路径存入session
-        handleMenuItemClick(path) {
-            window.sessionStorage.setItem('activePath', path)
-        }
 
     },
+    // 监听路由路径变化，改变当前导航栏激活项
+    watch: {
+        '$route.path': function(val) {
+            console.log("current router path:", val)
+            this.activeIndex = val
+        }
+    }
 }
 </script>
 

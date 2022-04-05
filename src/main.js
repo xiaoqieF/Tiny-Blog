@@ -29,6 +29,12 @@ axios.interceptors.request.use(config => {
 // 全局挂载axios
 Vue.prototype.$http = axios
 
+import dayjs from 'dayjs'
+// 注册全局时间格式化过滤器
+Vue.filter('dateFormat', function(originTime, format='YYYY年MM月DD日 HH:mm:ss'){
+  return dayjs(originTime).format(format);
+})
+
 // 引入全局样式
 import './style/global.css'
 // 引入图标字体
