@@ -24,7 +24,7 @@
             </el-form-item>
             <!-- markdown编辑器 -->
             <el-form-item prop="content">
-                <mavon-editor v-model="blog.content"/>
+                <mavon-editor v-model="blog.content" ref="mdEditor" @imgAdd="mdImgAdd"/>
             </el-form-item>
             <el-form-item>
                 <el-checkbox label="开启赞赏" v-model="blog.appreciation"></el-checkbox>
@@ -90,6 +90,7 @@
 </template>
 
 <script>
+import axios from 'axios'
 export default {
     name: 'publish',
     created() {
@@ -149,6 +150,7 @@ export default {
     methods: {
         handleRemove(file, fileList){
             console.log(file, fileList)
+            this.blog.firstPicture = ''
         },
         handleSuccess(response, file) {
             console.log(response)
@@ -174,14 +176,17 @@ export default {
                 this.tagList = res.data
             }
         },
-        async saveBlog() {
+        // 保存博客 = 上传未发表的博客
+        saveBlog() {
             this.blog.published = false
             this.uploadBlog()
         },
+        // 发表博客 = 上传发表的博客
         publishBlog() {
             this.blog.published = true
             this.uploadBlog()
         },
+        // 向服务器上传博客
         uploadBlog() {
             this.$refs.blogFormRef.validate(async valid => {
                 if (!valid) {
@@ -197,6 +202,26 @@ export default {
                 this.$message.success("上传成功！")
                 this.$router.push(`/blogAdmin/${this.$route.params.id}/manage`)
             })
+        },
+        // markdown编辑器添加图片时的回调
+        async mdImgAdd(pos, file) {
+            const formdata = new FormData()
+            formdata.append('file', file)
+            const {data: res} = await axios({
+                url: 'http://localhost:8082/private/blog/upload',
+                method: 'post',
+                data: formdata,
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': window.sessionStorage.getItem('token')
+                }
+            })
+            console.log(res)
+            if (res.meta.status !== 200) {
+                this.$message.error('图片上传失败：', res.meta.msg)
+                return
+            }
+            this.$refs.mdEditor.$img2Url(pos, res.path)
         }
     }
 }
