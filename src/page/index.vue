@@ -89,6 +89,9 @@ export default {
         this.activeIndex = this.$route.path
         this.lastHeight = window.scrollY
     },
+    beforeDestroy() {
+        window.removeEventListener('scroll', this.scrollHandler)
+    },
     data() {
         return {
             activeIndex: '',
@@ -160,6 +163,12 @@ export default {
     }
     .el-menu{
         border-bottom: 0;
+    }
+    .el-menu-item{
+        font-size: 18px;
+        i{
+            color: #fff;
+        }
     }
     .global_search{
         margin-top: 10px;

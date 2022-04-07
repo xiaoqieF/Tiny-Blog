@@ -21,48 +21,30 @@
             <generInfo />
             <!-- 右侧第二个卡片，显示推荐文章 -->
             <el-card class="recommend">
-                <div class="recommend-title">
+                <div class="right-header">
                     <i class="iconfont icon-idea"></i> 推荐阅读
                 </div>
                 <div class="recommend-content">
-                    <a href="#" class="recommend-item">
-                        <div class="recommend-title">Spring框架(三):动态代理和AOP</div>
+                    <router-link :to="`/detail/${blog.id}`" class="recommend-item" v-for="blog in recommendBlogList" :key="blog.id">
+                        <div class="recommend-title">{{ blog.title }}</div>
                         <div class="recommend-tag">
-                            <el-tag type="success" size="small">Spring</el-tag>
-                            <el-tag type="success" size="small">Spring</el-tag>
+                            <el-tag v-for="tag in blog.tags" :key="tag.id" type="success" size="mini">{{ tag.name }}</el-tag>
                         </div>
                         <div class="recommend-footer">
                             <div class="recommend-info">
-                                2022-03-26 13:05
+                                {{ blog.createTime | dateFormat }}
                             </div>
                         </div>
-                    </a>
-                    <a href="#" class="recommend-item">
-                        <div class="recommend-title">Spring框架(三):动态代理和AOP</div>
-                        <div class="recommend-tag">
-                            <el-tag type="success" size="small">Spring</el-tag>
-                            <el-tag type="success" size="small">Spring</el-tag>
-                        </div>
-                        <div class="recommend-footer">
-                            <div class="recommend-info">
-                                2022-03-26 13:05
-                            </div>
-                        </div>
-                    </a>
+                    </router-link>
                 </div>
             </el-card>
             <!-- 右侧第三个卡片， 标签墙-->
             <el-card>
-                <div>
-                    <i class="iconfont icon-tags"></i>标签墙
+                <div class="right-header">
+                    <i class="iconfont icon-tags"></i> 标签墙
                 </div>
-                <div class="tag-content">
-                    <a href="#" class="tag-item">
-                        Spring(10)
-                    </a>
-                    <a href="#" class="tag-item">
-                        Spring(10)
-                    </a>
+                <div class="tag-content" ref="tagRef">
+                    <wordCloud :height="tagWallWidth" :width="tagWallWidth" :RADIUS="tagWallWidth/2"/>
                 </div>
             </el-card>
         </el-col>
@@ -72,14 +54,17 @@
 <script>
 import generInfo from '../components/generInfo.vue'
 import blogSummary from '../components/blogSummary.vue'
+import wordCloud from '../components/wordCloud.vue'
 export default {
     name: "home",
     created() {
         this.getAllBlogs()
+        this.getRecommendBlogList()
     },
     components: {
         generInfo,
         blogSummary,
+        wordCloud,
     },
     data() {
         return {
@@ -89,7 +74,11 @@ export default {
             },
             totalBlogs: 0,
             pageSize: 10,
+            // 全部博客列表
             blogList: [],
+            // 推荐的博客列表
+            recommendBlogList: [],
+            tagWallWidth: 300,
         }
     },
     methods: {
@@ -106,6 +95,17 @@ export default {
                 this.$message.error('获取博客数据失败:', res.meta.msg)
             }
         },
+        // 获取所有推荐的博客
+        async getRecommendBlogList() {
+            const {data: res} = await this.$http.get('public/blog/recommend')
+            console.log(res)
+            if (res.meta.status === 200) {
+                this.recommendBlogList = res.data
+            } else {
+                this.$message.error('获取推荐博客数据失败:', res.meta.msg)
+            }
+        },
+
         // 分页页面大小变化后重新获取数据
         handleSizeChange(newSize) {
             this.blogQuery.pageSize = newSize
@@ -116,7 +116,16 @@ export default {
             this.blogQuery.pageNum = newPage
             this.getAllBlogs()
         },
-    }
+    },
+    mounted() {
+        const resizeObserver = new ResizeObserver(entries => {
+            for (let entry of entries) {
+                this.tagWallWidth = entry.target.clientWidth
+                console.log(entry.target.clientWidth)
+            }
+        });
+        resizeObserver.observe(document.querySelector('.tag-content'));
+        },
 }
 </script>
 
@@ -131,34 +140,28 @@ export default {
         display: flex;
         justify-content: center;
     }
+    .right-header{
+        padding-left: 6px;
+        border-left: 4px solid #409eff;
+        margin-bottom: 5px;
+    }
     .recommend-item{
         display: inline-block;
-        margin: 10px auto;
-        line-height: 1.8;
+        margin: 5px;
         width: 100%;
-        .recommend-title{
-            font-weight: bold;
-        }
+        font-size: 14px;
+        line-height: 1.8;
         .el-tag{
             margin-right: 5px;
         }
         .recommend-info{
-            font-size: 14px;
-            color: #444;
+            font-size: 12px;
+            color: #888;
         }
     }
     .recommend-item:hover{
-        color: #409eff;
+        background-color: #eee;
     }
 
-    .tag-item{
-        display: block;
-        width: 100%;
-        margin: 5px auto;
-        
-    }
-    .tag-item:hover{
-        color: #409eff;
-    }
     
 </style>

@@ -64,4 +64,8 @@ export default {
         display: flex;
         justify-content: center;
     }
+    .el-button{
+        font-size: 16px;
+        padding: 8px;
+    }
 </style>

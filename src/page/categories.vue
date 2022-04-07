@@ -30,11 +30,7 @@
             </el-card>
         </el-col>
         <el-col :span="6">
-            <generInfo moto="松花酿酒，春水煎茶" 
-            :archivesNum="10" 
-            :categoriesNum="12" 
-            :tagsNum="5">
-            </generInfo>
+            <generInfo/>
         </el-col>
     </el-row>
 </template>
