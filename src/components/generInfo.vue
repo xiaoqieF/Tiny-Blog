@@ -14,18 +14,18 @@
         </div>
         <!-- 统计信息 -->
         <div class="state">
-            <a href="#" class="state-item">
+            <router-link class="state-item" to="archives">
                 <div>{{siteInfo.archivesNum}}</div>
                 <div>归档</div>
-            </a>
-            <a href="#" class="state-item">
+            </router-link>
+            <router-link class="state-item" to="categories">
                 <div>{{siteInfo.categoriesNum}}</div>
                 <div>分类</div>
-            </a>
-            <a href="#" class="state-item">
+            </router-link>
+            <router-link class="state-item" to="tags">
                 <div>{{siteInfo.tagsNum}}</div>
                 <div>标签</div>
-            </a>
+            </router-link>
         </div>
     </el-card>
 </template>
@@ -48,6 +48,7 @@ export default {
         }
     },
     methods: {
+        // 获取用户信息
         async getUserInfo() {
             const {data: res} = await this.$http.get(`public/user/default`)
             if (res.meta.status !== 200) {
@@ -57,6 +58,7 @@ export default {
             console.log(res.data)
             this.userInfo = res.data
         },
+        // 获取网站基本信息
         async getSiteInfo() {
             const {data: res} = await this.$http.get(`public/statistics`)
             if (res.meta.status !== 200) {

@@ -18,15 +18,15 @@
                     <i class="el-icon-folder-opened"></i>
                     <span slot="title">归档</span>
                 </el-menu-item>
-                <el-menu-item index="categories">
+                <el-menu-item index="/categories">
                     <i class="el-icon-paperclip"></i>
                     <span slot="title">分类</span>
                 </el-menu-item>
-                <el-menu-item index="tags">
+                <el-menu-item index="/tags">
                     <i class="el-icon-price-tag"></i>
                     <span slot="title">标签</span>
                 </el-menu-item>
-                <el-menu-item index="about">
+                <el-menu-item index="/about">
                     <i class="el-icon-user-solid"></i>
                     <span slot="title">关于</span>
                 </el-menu-item>
@@ -86,11 +86,12 @@ export default {
     name: 'index',
     mounted() {
         window.addEventListener('scroll', this.scrollHandler)
+        this.activeIndex = this.$route.path
         this.lastHeight = window.scrollY
     },
     data() {
         return {
-            activeIndex: '/home',
+            activeIndex: '',
             // 全局搜索框内容
             serachInfo: '',
             // 滚动页面所处高度
@@ -112,6 +113,11 @@ export default {
                 this.navClass = 'header-nav-top'
             }
             this.lastHeight = height
+        }
+    },
+    watch: {
+        '$route.path': function(val) {
+            this.activeIndex = val
         }
     }
 }
