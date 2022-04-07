@@ -21,19 +21,16 @@
                 </template>
             </el-table-column>
             <el-table-column prop="user.nickname" label="作者" width="60px"></el-table-column>
-            <el-table-column label="分类" width="50px">
+            <el-table-column label="分类" width="80px">
                 <template slot-scope="scope">
-                    <el-tag 
-                    size="mini">
-                    {{ scope.row.type.name }}
-                    </el-tag>
+                    <el-tag size="small">{{ scope.row.type.name }}</el-tag>
                 </template>
             </el-table-column>
             <el-table-column label="标签" width="250px">
                 <template slot-scope="scope">
                     <el-tag 
                     type="success" 
-                    size="mini" 
+                    size="small" 
                     v-for="item in scope.row.tags" 
                     :key="item.id" 
                     style="margin:5px">
@@ -43,8 +40,8 @@
             </el-table-column>
             <el-table-column label="是否发表" >
                 <template slot-scope="scope">
-                    <el-tag v-if="scope.row.published" size="mini" type="success">是</el-tag>
-                    <el-tag v-else size="mini" type="danger">否</el-tag>
+                    <el-tag v-if="scope.row.published" size="small" type="success">是</el-tag>
+                    <el-tag v-else size="small" type="danger">否</el-tag>
                 </template>
             </el-table-column>
             <!-- 编辑和删除博客操作栏 -->
@@ -182,7 +179,7 @@ export default {
         },
         // 获取所有博客
         async getAllBlogs() {
-            const {data: res} = await this.$http.get('private/blog', {
+            const {data: res} = await this.$http.get('public/blog', {
                 params: this.blogQuery,
             })
             console.log(res)

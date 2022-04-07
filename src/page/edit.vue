@@ -1,7 +1,7 @@
 <template>
     <el-card shadow="never" class="container">
         <div class="title">
-            编辑博客
+            编辑博客 -- {{ blog.title }}
         </div>
         <el-form ref="blogFormRef" :model="blog" :rules="blogFormRules">
             <el-form-item prop="title">

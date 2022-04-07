@@ -1,12 +1,12 @@
 <template>
     <div class="container">
-        <el-row class="header">
+        <el-row class="header-nav" :class="navClass">
             <!-- 导航栏 -->
             <el-col :span="12" :offset="2">
                 <el-menu
                 :default-active="activeIndex"
                 mode="horizontal"
-                background-color= "#333"
+                background-color= "transparent"
                 text-color="#fff"
                 active-text-color="#fff"
                 router>
@@ -38,9 +38,19 @@
                     <el-button slot="append" icon="el-icon-search"></el-button>
                 </el-input>
             </el-col>
-            <el-col :span="4">
-                <el-avatar style="float:right" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar>
-            </el-col>
+        </el-row>
+        <!-- 背景图片 -->
+        <el-row>
+            <div class="back-img">
+                <div class="site-name">
+                    <div class="site-title">
+                        小切的博客
+                    </div>
+                    <div class="site-sub-moto">
+                        所念皆星河
+                    </div>
+                </div>
+            </div>
         </el-row>
         <el-row>
             <!-- 中央区域 -->
@@ -74,13 +84,36 @@
 <script>
 export default {
     name: 'index',
+    mounted() {
+        window.addEventListener('scroll', this.scrollHandler)
+        this.lastHeight = window.scrollY
+    },
     data() {
         return {
             activeIndex: '/home',
             // 全局搜索框内容
             serachInfo: '',
+            // 滚动页面所处高度
+            lastHeight: 0,
+            navClass: 'header-nav-top',
         }
     },
+    methods: {
+        scrollHandler(event) {
+            let height = event.srcElement.scrollingElement.scrollTop
+            if (height > this.lastHeight) {
+                // console.log('下滚')
+                this.navClass = 'header-nav-down'
+            } else if (height < this.lastHeight) {
+                // console.log('上滚')
+                this.navClass = 'header-nav-up'
+            }
+            if (height === 0) {
+                this.navClass = 'header-nav-top'
+            }
+            this.lastHeight = height
+        }
+    }
 }
 </script>
 
@@ -88,8 +121,36 @@ export default {
     .container{
         height: 100%;
     }
-    .header, .footer{
+    .header-nav{
+        position: fixed;
+        width: 100%;
+        z-index: 3;
+        transition: transform 0.2s linear;
+    }
+    .header-nav-down{
         background-color: #333;
+        transform: translateY(-100%);
+    }
+    .header-nav-up{
+        transform: translateY(0);
+        background-color: #333;
+    }
+    .back-img{
+        height: 80vh;
+        background: url("../assets/background.jpg") no-repeat center/cover;
+        z-index: -1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #eee;
+        .site-title{
+            font-size: 4rem;
+            font-weight: bold;
+        }
+        .site-sub-moto{
+            font-size: 1.5rem;
+            text-align: center;
+        }
     }
     .el-menu{
         border-bottom: 0;
@@ -108,6 +169,7 @@ export default {
         width: 100%;
         margin-top: 100px;
         text-align: center;
+        background-color: #333;
         color: #aaa;
         font-size: 16px;
         .el-link{

@@ -1,25 +1,24 @@
 <template>
     <el-row class="container" :gutter="10">
         <el-col :span="18">
-            <blogSummary/>
-            <blogSummary/>
+            <blogSummary v-for="blogInfo in blogList" :key="blogInfo.id" :blogInfo="blogInfo" />
             <!-- 分页栏 -->
             <el-card class="page">
+                <!-- 分页 -->
                 <el-pagination
-                background
-                layout="prev, pager, next"
-                :page-size="pageSize"
-                :total="total">
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :current-page="blogQuery.pageNum"
+                :page-sizes="[5, 10, 15, 20]"
+                :page-size="blogQuery.pageSize"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="totalBlogs">
                 </el-pagination>
             </el-card>
         </el-col>
         <el-col :span="6">
             <!-- 右侧第一个卡片，显示网站基本信息 -->
-            <generInfo moto="松花酿酒，春水煎茶" 
-            :archivesNum="10" 
-            :categoriesNum="12" 
-            :tagsNum="5">
-            </generInfo>
+            <generInfo />
             <!-- 右侧第二个卡片，显示推荐文章 -->
             <el-card class="recommend">
                 <div class="recommend-title">
@@ -75,17 +74,49 @@ import generInfo from '../components/generInfo.vue'
 import blogSummary from '../components/blogSummary.vue'
 export default {
     name: "home",
+    created() {
+        this.getAllBlogs()
+    },
     components: {
         generInfo,
         blogSummary,
     },
     data() {
         return {
-            total: 10,
+            blogQuery: {
+                pageNum: 1,
+                pageSize: 5,
+            },
+            totalBlogs: 0,
             pageSize: 10,
-
+            blogList: [],
         }
     },
+    methods: {
+        // 获取所有博客
+        async getAllBlogs() {
+            const {data: res} = await this.$http.get('public/blog', {
+                params: this.blogQuery,
+            })
+            console.log(res)
+            if (res.meta.status === 200) {
+                this.blogList = res.data.blogList
+                this.totalBlogs = res.data.total
+            } else {
+                this.$message.error('获取博客数据失败:', res.meta.msg)
+            }
+        },
+        // 分页页面大小变化后重新获取数据
+        handleSizeChange(newSize) {
+            this.blogQuery.pageSize = newSize
+            this.getAllBlogs()
+        },
+        // 当前选择页面变化后重新获取数据
+        handleCurrentChange(newPage) {
+            this.blogQuery.pageNum = newPage
+            this.getAllBlogs()
+        },
+    }
 }
 </script>
 

@@ -207,7 +207,7 @@ export default {
         async mdImgAdd(pos, file) {
             const formdata = new FormData()
             formdata.append('file', file)
-            const {data: res} = await axios({
+            const {data: res} = await this.$http({
                 url: 'http://localhost:8082/private/blog/upload',
                 method: 'post',
                 data: formdata,

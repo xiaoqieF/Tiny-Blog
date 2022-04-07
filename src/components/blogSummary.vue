@@ -2,25 +2,32 @@
     <!-- 博客列表：标题，信息，摘要 -->
     <el-card :shadow="shadow">
         <!-- 标题 -->
-        <div class="title"><a href="#">Spring框架(三):动态代理和AOP</a></div>
+        <div class="title">
+            <router-link :to="`/detail/${blogInfo.id}`">{{ blogInfo.title }}</router-link>
+        </div>
         <!-- 文章信息（发表时间、阅读次数等） -->
         <div class="subtitle">
-            <div><i class="el-icon-edit-outline"></i><span> 发表于 2022-03-26</span></div>
-            <div><i class="el-icon-edit-outline"></i><span> 更新于 2022-03-26</span></div>
-            <div><i class="el-icon-view"></i><span> 阅读次数 11</span></div>
+            <div><i class="el-icon-edit-outline"></i><span> 发表于 {{blogInfo.createTime | dateFormat}}</span></div>
+            <div><i class="el-icon-edit-outline"></i><span> 更新于 {{blogInfo.updateTime | dateFormat}}</span></div>
+            <div><i class="el-icon-view"></i><span> 阅读次数 {{ blogInfo.views }}</span></div>
         </div>
         
-        <p class="content">本文介绍了Spring AOP相关的原理和使用方法。包括Java中动态代理的两种实现方式：原生JDK动态代理和CGLIB动态代理，还介绍了基于注解和配置两种方式来使用Spring AOP。</p>
+        <p class="content">{{ blogInfo.description }}</p>
         <div class="btn">
-            <el-button type="primary">阅读原文<i class="el-icon-right"></i></el-button>
+            <el-button type="primary" @click="toDetail">阅读原文<i class="el-icon-right"></i></el-button>
         </div>
     </el-card>
 </template>
 
 <script>
 export default {
-    props:['shadow', ],
+    props:['shadow', 'blogInfo'],
     name: 'blogSummary',
+    methods: {
+        toDetail() {
+            this.$router.push(`/detail/${this.blogInfo.id}`)
+        }
+    },
 }
 </script>
 

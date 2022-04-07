@@ -3,10 +3,10 @@
     <!-- 右侧第一个卡片，显示网站基本信息 -->
     <el-card class="general-info">
         <div class="avatar">
-            <img src="../assets/profile.png" alt="">
+            <img :src="this.userInfo.avatar" alt="">
         </div>
         <div class="moto">
-            {{moto}}
+            所念皆星河
         </div>
         <div class="social">
             <a href="https://github.com/xiaoqieF" target="_blank" class="social-item"><i class="iconfont icon-github"></i></a>
@@ -15,15 +15,15 @@
         <!-- 统计信息 -->
         <div class="state">
             <a href="#" class="state-item">
-                <div>{{archivesNum}}</div>
+                <div>{{siteInfo.archivesNum}}</div>
                 <div>归档</div>
             </a>
             <a href="#" class="state-item">
-                <div>{{categoriesNum}}</div>
+                <div>{{siteInfo.categoriesNum}}</div>
                 <div>分类</div>
             </a>
             <a href="#" class="state-item">
-                <div>{{tagsNum}}</div>
+                <div>{{siteInfo.tagsNum}}</div>
                 <div>标签</div>
             </a>
         </div>
@@ -33,12 +33,40 @@
 <script>
 export default {
     name: "generInfo",
-    props: ['moto', 'archivesNum', 'categoriesNum', 'tagsNum'],
+    created() {  
+        this.getUserInfo()
+        this.getSiteInfo()
+    },
     data() {
         return {
-            
+            userInfo: {},
+            siteInfo: {
+                archivesNum: 0,
+                categoriesNum: 0,
+                tagsNum: 0,
+            }
         }
     },
+    methods: {
+        async getUserInfo() {
+            const {data: res} = await this.$http.get(`public/user/default`)
+            if (res.meta.status !== 200) {
+                this.$message.error("获取用户信息失败：" + res.meta.msg)
+                return
+            }
+            console.log(res.data)
+            this.userInfo = res.data
+        },
+        async getSiteInfo() {
+            const {data: res} = await this.$http.get(`public/statistics`)
+            if (res.meta.status !== 200) {
+                this.$message.error("获取网站信息失败：" + res.meta.msg)
+                return
+            }
+            console.log(res.data)
+            this.siteInfo = res.data
+        },
+    }
 }
 </script>
 

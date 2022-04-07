@@ -36,7 +36,7 @@ const router = new VueRouter({
                     component: archives,
                 },
                 {
-                    path: '/detail',
+                    path: '/detail/:blogId',
                     component: detail,
                 },
                 {
