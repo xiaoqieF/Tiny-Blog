@@ -87,6 +87,10 @@ export default {
                 width: 100%;
             }
         }
+        .avatar:hover{
+            animation: bounce; /* referring directly to the animation's @keyframe declaration */
+            animation-duration: 1s; /* don't forget to set a duration! */
+        }
         .moto{
             text-align: center;
             font-weight: 800;
@@ -127,5 +131,8 @@ export default {
             border-right: 1px dashed #444;
         }
         
+    }
+    .iconfont{
+        margin-right: 5px;
     }
 </style>

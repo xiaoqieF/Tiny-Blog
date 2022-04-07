@@ -25,7 +25,6 @@
             tag.x = this.CX +  this.RADIUS * Math.sin(a) * Math.cos(b);//根据标签角度求出标签的x,y,z坐标
             tag.y = this.CY +  this.RADIUS * Math.sin(a) * Math.sin(b);
             tag.z = this.RADIUS * Math.cos(a);
-            // tag.href = 'https://imgss.github.io';//给标签添加链接
             this.tags.push(tag);
         }
     },

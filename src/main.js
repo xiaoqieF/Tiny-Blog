@@ -39,6 +39,8 @@ Vue.filter('dateFormat', function(originTime, format='YYYY年MM月DD日 HH:mm:ss
 import './style/global.css'
 // 引入图标字体
 import "./assets/iconfont/iconfont.css"
+// 引入动画样式
+import 'animate.css';
 
 Vue.config.productionTip = false
 
