@@ -46,8 +46,17 @@
                 <div class="comment-tips">来评论吧~~~</div>
             </el-card>
         </el-col>
-        <el-col :xs="0" :md="6" :lg="6">
+        <el-col ref="sideRef" :xs="0" :md="6" :lg="6">
             <generInfo/>
+            <!-- 目录区域 -->
+            <el-card :class="dirClass" ref="dirRef">
+                <div class="dir-title">
+                    目录
+                </div>
+                <!-- 目录内容，由tocbot生成 -->
+                <div class="dir-content">
+                </div>
+            </el-card>
         </el-col>
     </el-row>
 </template>
@@ -55,6 +64,7 @@
 <script>
 import generInfo from '../components/generInfo.vue'
 import Prism from 'prismjs'
+import * as tocbot from 'tocbot'
 export default {
     name: 'detail',
     components: {
@@ -66,8 +76,22 @@ export default {
         // 可能会存在数据还未获取就渲染页面的情况
         Prism.highlightAll()
         this.$formula(this.$refs.contentRef)
+        tocbot.init({
+        // Where to render the table of contents.
+        tocSelector: '.dir-content',
+        // Where to grab the headings to build the table of contents.
+        contentSelector: '.content',
+        // Which headings to grab inside of the contentSelector element.
+        headingSelector: 'h1, h2, h3',
+        // For headings inside relative or absolute positioned containers within content.
+        hasInnerContainers: true,
+        });
     },
     mounted() {
+        window.addEventListener('scroll', this.scrollHandler)
+    },
+    beforeDestroy() {
+        window.removeEventListener('scroll', this.scrollHandler)
     },
     data() {
         return {
@@ -77,6 +101,7 @@ export default {
                 content: '',
             },
             blog:{},
+            dirClass: '',
         }
     },
     methods: {
@@ -88,12 +113,21 @@ export default {
             } else {
                 this.$message.error('获取博客数据失败:', res.meta.msg)
             }
+        },
+        scrollHandler(event) {
+            // 根据目录标签距离顶部距离来实现贴合效果
+            if (this.$refs.sideRef.$el.getBoundingClientRect().top < -250) {
+                this.dirClass = 'dir-sticky'
+            } else {
+                this.dirClass = ''
+            }
         }
     },
 }
 </script>
 
 <style lang='less' scoped>
+    @import '../style/tocbot.css';
     .container{
         margin-top: 20px;
     }
@@ -165,17 +199,31 @@ export default {
         }
     }
 
-.markdown-body {
-    box-sizing: border-box;
-    min-width: 200px;
-    max-width: 980px;
-    margin: 0 auto;
-    padding: 45px;
-}
- 
-@media (max-width: 767px) {
     .markdown-body {
-        padding: 15px;
+        box-sizing: border-box;
+        min-width: 200px;
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 45px;
     }
-}
+    
+    @media (max-width: 767px) {
+        .markdown-body {
+            padding: 15px;
+        }
+    }
+    // .dir{
+    //     position: fixed;
+    //     bottom: 0;
+    //     right: 0;
+    // }
+    .dir-sticky{
+        position: fixed;
+        top: 60px;
+    }
+    .dir-title{
+        padding-left: 10px;
+        font-size: 18px;
+        border-left: 4px solid #409eff;
+    }
 </style>
