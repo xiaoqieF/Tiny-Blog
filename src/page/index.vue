@@ -54,7 +54,7 @@
         </el-row>
         <el-row>
             <!-- 中央区域 -->
-            <el-col :span="20" :offset="2" :xl="{span:14, offset:5}">
+            <el-col :span="22" :offset="1" :xl="{span:14, offset:5}">
                 <router-view></router-view>
             </el-col>
         </el-row>

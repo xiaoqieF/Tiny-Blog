@@ -166,7 +166,7 @@ export default {
         // 获取当前编辑的博客信息
         async getBlog() {
             console.log(this.$route.params)
-            const {data: res} = await this.$http.get(`/public/blog/${this.$route.params.blogId}`)
+            const {data: res} = await this.$http.get(`/public/blog/raw/${this.$route.params.blogId}`)
             console.log(res)
             if (res.meta.status !== 200) {
                 return this.$message.error('获取博客信息失败：', res.meta.msg)

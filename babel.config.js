@@ -10,6 +10,15 @@ module.exports = {
         libraryName: "element-ui",
         styleLibraryName: "theme-chalk"
       }
+    ],
+    [
+      'prismjs', 
+      {
+        'languages': ['javascript', 'css', 'markup', 'python', 'html', 'java'],
+        'plugins': ['line-numbers'],
+        'theme': 'okaidia',
+        'css': true
+      }
     ]
   ]
 }

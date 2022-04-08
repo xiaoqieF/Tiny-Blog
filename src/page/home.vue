@@ -1,6 +1,6 @@
 <template>
     <el-row class="container" :gutter="10">
-        <el-col :span="18">
+        <el-col :lg="18" :xs="24">
             <blogSummary v-for="blogInfo in blogList" :key="blogInfo.id" :blogInfo="blogInfo" />
             <!-- 分页栏 -->
             <el-card class="page">
@@ -16,7 +16,7 @@
                 </el-pagination>
             </el-card>
         </el-col>
-        <el-col :span="6">
+        <el-col :lg="6" :xs="0" class='side-info'>
             <!-- 右侧第一个卡片，显示网站基本信息 -->
             <generInfo />
             <!-- 右侧第二个卡片，显示推荐文章 -->

@@ -14,15 +14,15 @@
         </div>
         <!-- 统计信息 -->
         <div class="state">
-            <router-link class="state-item" to="archives">
+            <router-link class="state-item" to="/archives">
                 <div>{{siteInfo.archivesNum}}</div>
                 <div>归档</div>
             </router-link>
-            <router-link class="state-item" to="categories">
+            <router-link class="state-item" to="/categories">
                 <div>{{siteInfo.categoriesNum}}</div>
                 <div>分类</div>
             </router-link>
-            <router-link class="state-item" to="tags">
+            <router-link class="state-item" to="/tags">
                 <div>{{siteInfo.tagsNum}}</div>
                 <div>标签</div>
             </router-link>

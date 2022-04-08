@@ -41,6 +41,29 @@ import './style/global.css'
 import "./assets/iconfont/iconfont.css"
 // 引入动画样式
 import 'animate.css';
+// 引入github-markdown样式
+import 'github-markdown-css/github-markdown.css'
+
+// 数学公式katex支持
+import katex from 'katex'
+import 'katex/dist/katex.css'
+import renderMathInElement from 'katex/contrib/auto-render/auto-render'
+
+// 定义自动渲染的配置参数,这些参数根据你的需求进行修改，下面的参数是官网上抄下来的
+const renderOption = {
+  delimiters: [
+    {left: '$$', right: '$$', display: true},
+    {left: '$', right: '$', display: false},
+    {left: '\\(', right: '\\)', display: false},
+    {left: '\\[', right: '\\]', display: true}
+  ],
+  throwOnError : false
+}
+
+// 挂载自动渲染函数到vue原型
+Vue.prototype.$formula = function (dom) {
+  renderMathInElement(dom, renderOption)
+}
 
 Vue.config.productionTip = false
 
