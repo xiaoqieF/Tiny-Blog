@@ -179,7 +179,7 @@ export default {
         },
         // 获取所有博客
         async getAllBlogs() {
-            const {data: res} = await this.$http.get('public/blog', {
+            const {data: res} = await this.$http.get('private/blog', {
                 params: this.blogQuery,
             })
             console.log(res)

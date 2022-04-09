@@ -2,6 +2,8 @@
     <el-row class="container" :gutter="20">
         <el-col :xs="24" :md="18" :lg="18">
             <el-card>
+                <!-- 文章首图 -->
+                <img v-if="blog.firstPicture" :src="blog.firstPicture" alt="" style="width:100%">
                 <!-- 文章标题 -->
                 <div class="title">
                     {{ blog.title }}
@@ -35,15 +37,75 @@
             </el-card>
             <!-- 评论区 -->
             <el-card class="comment">
-                <el-input v-model="commentForm.name" placeholder="请输入昵称" prefix-icon="iconfont icon-person"></el-input>
-                <el-input v-model="commentForm.email" placeholder="请输入邮箱" prefix-icon="iconfont icon-youxiang"></el-input>
-                <el-input 
-                type="textarea" 
-                placeholder="请输入内容" 
-                :rows="6"
-                v-model="commentForm.content"></el-input>
-                <el-button type="primary" size="mini">发布</el-button>
-                <div class="comment-tips">来评论吧~~~</div>
+                <el-card shadow='never'>
+                    <div class="comment-title">
+                        评论区
+                    </div>
+                    <div class="comment-item" v-for="comment in comments" :key="comment.id">
+                        <div class="parent-comment">
+                            <el-avatar v-if="comment.avatar" :src='comment.avatar'></el-avatar>
+                            <el-avatar v-else src='https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'></el-avatar>
+                            <div class="comment-main">
+                                <div class="comment-info">
+                                    <div class="nickname">{{ comment.nickname }}</div>
+                                    <div class="create-time">{{ comment.createTime | dateFormat }}</div>
+                                </div>
+                                <div class="comment-content">
+                                    {{ comment.content }}
+                                </div>
+                            </div>
+                            <div class="reply" @click="onReply(comment.id, comment.nickname)">
+                                回复
+                            </div>
+                            
+                        </div>
+                        <div class="child-comment" v-for="childComment in comment.replyComments" :key="childComment.id">
+                            <el-avatar src='https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'></el-avatar>
+                            <div class="comment-main">
+                                <div class="comment-info">
+                                    <div class="nickname">{{ childComment.nickname }}</div>
+                                    <div class="create-time">{{ childComment.createTime | dateFormat }}</div>
+                                </div>
+                                <div class="comment-content">
+                                    {{ childComment.content }}
+                                </div>
+                            </div>
+                            <div class="reply" @click="onReply(childComment.id, childComment.nickname)">
+                                回复
+                            </div>
+                        </div>
+                    </div>
+                </el-card>
+                <el-card shadow='never'>
+                    <el-form 
+                    :model="commentForm" 
+                    :rules="commentFormRules" 
+                    ref="commentFormRef">
+                        <el-form-item prop="nickname" class="comment-name">
+                            <el-input 
+                            v-model="commentForm.nickname" 
+                            placeholder="请输入昵称" 
+                            prefix-icon="iconfont icon-person"></el-input>
+                        </el-form-item>
+                        <el-form-item prop="email" class="comment-email">
+                            <el-input 
+                            v-model="commentForm.email" 
+                            placeholder="请输入邮箱" 
+                            prefix-icon="iconfont icon-youxiang"></el-input>
+                        </el-form-item>
+                        <el-form-item prop="content">
+                            <el-input 
+                            ref="commentContentRef"
+                            type="textarea" 
+                            :placeholder="commentPlaceholder" 
+                            :rows="6"
+                            v-model="commentForm.content"></el-input>
+                        </el-form-item>
+                    </el-form>
+                    <el-button type="primary" size="mini" @click="publishComment">发布</el-button>
+                    <el-button type="info" size="mini" @click="clearComment">重置</el-button>
+                    <div class="comment-tips">来评论吧~~~</div>
+                </el-card>
             </el-card>
         </el-col>
         <el-col ref="sideRef" :xs="0" :md="6" :lg="6">
@@ -72,19 +134,20 @@ export default {
     },
     async created() {
         await this.getBlog()
+        this.getComment()
         // 这里使公式和代码格式化并不放在mounted中，因为created和mounted钩子使异步执行的
         // 可能会存在数据还未获取就渲染页面的情况
         Prism.highlightAll()
         this.$formula(this.$refs.contentRef)
         tocbot.init({
-        // Where to render the table of contents.
-        tocSelector: '.dir-content',
-        // Where to grab the headings to build the table of contents.
-        contentSelector: '.content',
-        // Which headings to grab inside of the contentSelector element.
-        headingSelector: 'h1, h2, h3',
-        // For headings inside relative or absolute positioned containers within content.
-        hasInnerContainers: true,
+            // Where to render the table of contents.
+            tocSelector: '.dir-content',
+            // Where to grab the headings to build the table of contents.
+            contentSelector: '.content',
+            // Which headings to grab inside of the contentSelector element.
+            headingSelector: 'h1, h2, h3',
+            // For headings inside relative or absolute positioned containers within content.
+            hasInnerContainers: true,
         });
     },
     mounted() {
@@ -94,17 +157,44 @@ export default {
         window.removeEventListener('scroll', this.scrollHandler)
     },
     data() {
+        // 自定义邮箱验证规则
+        var checkEmail = (rule, value, callback) => {
+            var reg = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/;
+            if (reg.test(value)){
+                callback();
+            }
+            callback(new Error('邮箱格式错误'));
+        };
         return {
             commentForm:{
-                name: '',
+                nickname: '',
                 email: '',
                 content: '',
+                parentCommentId: -1,
+                blogId: this.$route.params.blogId,
             },
+            commentFormRules: {
+                nickname: [
+                    { required: true, message: '请输入昵称', trigger: 'change'},
+                ],
+                content: [
+                    { required: true, message: '请输入评论内容', trigger: 'change'},
+                ],
+                email: [
+                    { required: true, message: '请输入邮箱', trigger: 'change'},
+                    {validator: checkEmail, message:'请输入正确的邮箱', trigger: 'change'},
+                ],
+            },
+            commentPlaceholder: "请输入内容",
+            // 博客信息
             blog:{},
+            // 目录标签的所属类，用于改变样式
             dirClass: '',
+            comments:[],
         }
     },
     methods: {
+        // 获取当前页的博客信息
         async getBlog() {
             const {data: res} = await this.$http.get(`public/blog/${this.$route.params.blogId}`)
             console.log(res)
@@ -114,13 +204,77 @@ export default {
                 this.$message.error('获取博客数据失败:', res.meta.msg)
             }
         },
+        // 获取当前页的评论信息
+        async getComment() {
+            const {data: res} = await this.$http.get(`public/comment/${this.$route.params.blogId}`)
+            console.log(res)
+            if (res.meta.status === 200) {
+                this.comments = res.data
+            } else {
+                this.$message.error('获取评论数据失败:', res.meta.msg)
+            }
+            this.comments.forEach(comment => {
+                // 对每个一级评论的子评论进行扁平化处理
+                // 处理之后，评论只有两级
+                comment.replyComments = this.traverse(comment.nickname, comment.replyComments)
+            });
+            console.log(this.comments)
+        },
+
+        /**
+         * 将多级评论转化为数组评论，并在评论内容前加上对应的 @fatherName
+         * @param comments 需要扁平化处理的评论数组(多级评论)
+         * @param fatherName 当前评论数组的父亲名称
+         * @return 一级的评论数组
+         */
+        traverse(fatherName, comments) {
+            if (comments.length === 0) {
+                return []
+            }
+            let results = []
+            comments.forEach( comment => {
+                comment.content = `@${fatherName}：${comment.content}`
+                results.push(comment)
+                results = [...results, ...this.traverse(comment.nickname, comment.replyComments)]
+                // 遍历完孩子之后，将孩子置为空
+                comment.replyComments = []
+            })
+            return results
+        },
         scrollHandler(event) {
+            // console.log(this.$refs.sideRef)
             // 根据目录标签距离顶部距离来实现贴合效果
             if (this.$refs.sideRef.$el.getBoundingClientRect().top < -250) {
                 this.dirClass = 'dir-sticky'
             } else {
                 this.dirClass = ''
             }
+        },
+        // 发布评论
+        publishComment() {
+            this.$refs.commentFormRef.validate(async valid => {
+                if (!valid) {
+                    return
+                }
+                const {data: res} = await this.$http.post('/public/comment', this.commentForm)
+                console.log(res)
+                if (res.meta.status !== 200) {
+                    this.$message.error('发布评论失败！', res.meta.msg)
+                }
+                this.$message.success('发布成功！')
+                this.getComment()
+            })
+        },
+        clearComment() {
+            this.commentForm.content = ''
+            this.commentForm.parentCommentId = -1
+            this.commentPlaceholder = "请输入内容"
+        },
+        onReply(parentId, parentNickName) {
+            console.log(parentId, parentNickName)
+            this.commentForm.parentCommentId = parentId
+            this.commentPlaceholder = `@${parentNickName}`
+            this.$refs.commentFormRef.$el.scrollIntoView()
         }
     },
 }
@@ -178,14 +332,8 @@ export default {
     }
     .comment{
         margin-top: 20px;
-        .el-input{
-            margin: 10px 10px 10px 0;
-        }
-        .el-input:first-child{
-            width: 30%;
-        }
-        .el-input:nth-child(2){
-            width: 30%;
+        .comment-item{
+            margin-bottom: 40px;
         }
         .el-button{
             margin: 10px 10px 20px auto;
@@ -197,6 +345,48 @@ export default {
             font-size: 16px;
             padding: 20px;
         }
+        .comment-name, .comment-email{
+            display: inline-block;
+            margin-right: 10px;
+        }
+    }
+
+    .reply{
+        font-size: 14px;
+        color: #ff8956;
+        cursor: pointer;
+    }
+
+    .comment-title{
+        font-size: 24px;
+        font-weight: 600;
+        color: #444950;
+        margin-bottom: 20px;
+    }
+
+    .parent-comment{
+        display: flex;
+    }
+
+    .comment-main{
+        display: inline-block;
+        margin-left: 20px;
+        color: #409eff;
+        .create-time{
+            font-size: 14px;
+            color: #ccd0d5;
+            margin-top: 10px;
+        }
+    }
+    .comment-content{
+        color: #444950;
+        margin-top: 10px;
+    }
+
+    .child-comment{
+        display: flex;
+        margin-top: 20px;
+        padding-left: 60px;
     }
 
     .markdown-body {
@@ -212,11 +402,6 @@ export default {
             padding: 15px;
         }
     }
-    // .dir{
-    //     position: fixed;
-    //     bottom: 0;
-    //     right: 0;
-    // }
     .dir-sticky{
         position: fixed;
         top: 60px;
