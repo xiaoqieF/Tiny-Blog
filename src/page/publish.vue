@@ -105,7 +105,7 @@ export default {
                 content: '',
                 description: '',
                 appreciation: false,
-                commentEnable: false,
+                commentEnable: true,
                 recommend: false,
                 shareStatement: false,
                 firstPicture: '',

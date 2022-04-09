@@ -36,7 +36,7 @@
                 </div>
             </el-card>
             <!-- 评论区 -->
-            <el-card class="comment">
+            <el-card v-if="blog.commentEnable" class="comment">
                 <el-card shadow='never'>
                     <div class="comment-title">
                         评论区
@@ -274,7 +274,7 @@ export default {
             console.log(parentId, parentNickName)
             this.commentForm.parentCommentId = parentId
             this.commentPlaceholder = `@${parentNickName}`
-            this.$refs.commentFormRef.$el.scrollIntoView()
+            this.$refs.commentFormRef.$el.scrollIntoView({behavior:'smooth'})
         }
     },
 }
@@ -362,6 +362,8 @@ export default {
         font-weight: 600;
         color: #444950;
         margin-bottom: 20px;
+        padding-left: 20px;
+        border-left: 4px solid #ff8956;
     }
 
     .parent-comment{

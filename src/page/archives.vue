@@ -3,18 +3,19 @@
         <el-col :span="18">
             <el-card>
                 <div class="archives-title">
-                    目前共20篇文章，继续努力！
+                    目前共 {{ totalBlogs }} 篇文章，继续努力！
                 </div>
-                <el-timeline>
+                <el-timeline reverse>
                     <el-timeline-item
-                    v-for="(activity, index) in activities"
-                    :key="index"
-                    :icon="activity.icon"
-                    :type="activity.type"
-                    :color="activity.color"
-                    :size="activity.size"
-                    :timestamp="activity.timestamp">
-                    {{activity.content}}
+                    v-for="blog in blogList"
+                    :key="blog.id"
+                    type="primary"
+                    size="large"
+                    :timestamp="blog.createTime | dateFormat"
+                    placement="top">
+                    <router-link :to="`/detail/${blog.id}`">
+                        {{ blog.title }}
+                    </router-link>
                     </el-timeline-item>
                 </el-timeline>
             </el-card>
@@ -32,27 +33,27 @@ export default {
     components: {
         generInfo,
     },
+    created() {
+        this.getAllBlogs()
+    },
     data() {
         return {
-            activities: [{
-            content: '支持使用图标',
-            timestamp: '2018-04-12 20:46',
-            size: 'large',
-            type: 'primary',
-            icon: 'el-icon-more'
-            }, {
-            content: '支持自定义颜色',
-            timestamp: '2018-04-03 20:46',
-            color: '#0bbd87'
-            }, {
-            content: '支持自定义尺寸',
-            timestamp: '2018-04-03 20:46',
-            size: 'large'
-            }, {
-            content: '默认样式的节点',
-            timestamp: '2018-04-03 20:46'
-            }],
+            blogList: [],
+            totalBlogs: 0,
         }
+    },
+    methods: {
+        // 获取所有博客
+        async getAllBlogs() {
+            const {data: res} = await this.$http.get('public/blog')
+            console.log(res)
+            if (res.meta.status === 200) {
+                this.blogList = res.data.blogList
+                this.totalBlogs = res.data.total
+            } else {
+                this.$message.error('获取博客数据失败:', res.meta.msg)
+            }
+        },
     },
 
 }
@@ -64,10 +65,12 @@ export default {
         .archives-title{
             font-weight: bold;
             font-size: 20px;
-            padding-left: 20px;
+            padding-left: 30px;
+            margin-top: 20px;
         }
     }
     .el-timeline{
-        margin-top: 20px;
+        margin-top: 40px;
+        font-size: 16px;
     }
 </style>
