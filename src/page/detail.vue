@@ -149,6 +149,7 @@ export default {
             // For headings inside relative or absolute positioned containers within content.
             hasInnerContainers: true,
         });
+        this.increaseViews()
     },
     mounted() {
         window.addEventListener('scroll', this.scrollHandler)
@@ -265,16 +266,23 @@ export default {
                 this.getComment()
             })
         },
+        // 重置评论
         clearComment() {
             this.commentForm.content = ''
             this.commentForm.parentCommentId = -1
             this.commentPlaceholder = "请输入内容"
         },
+        // 点击回复时触发的回调
         onReply(parentId, parentNickName) {
             console.log(parentId, parentNickName)
             this.commentForm.parentCommentId = parentId
             this.commentPlaceholder = `@${parentNickName}`
             this.$refs.commentFormRef.$el.scrollIntoView({behavior:'smooth'})
+        },
+        // 增加一个阅读量
+        async increaseViews() {
+            const {data: res} = await this.$http.post(`/public/blog/view/${this.$route.params.blogId}`)
+                console.log(res)
         }
     },
 }
