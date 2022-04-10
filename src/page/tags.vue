@@ -3,33 +3,28 @@
         <el-col :span="18">
             <el-card>
                 <div class="title">
-                    标签-- 30
+                    标签-- {{tagList.length}}
                 </div>
                 <!-- 分类表格 -->
                 <el-card class="tag-directory" shadow="never">
                     <div class="tag-dir">
-                        <el-radio v-model="currentTag" :label="1" border>
-                            <i class="iconfont icon-tags">Spring(12)</i>
-                        </el-radio>
-                        <el-radio v-model="currentTag" :label="2" border>
-                            <i class="iconfont icon-tags">AOP(3)</i>
-                        </el-radio> 
+                        <div 
+                        ref="tagItemRef"
+                        class="tag-item" 
+                        v-for="(tag, index) in this.tagList" 
+                        :key="tag.id"
+                        @click="tagClick($event, index)">
+                            <i class="iconfont icon-tags">{{ tag.name }}({{ tag.blogInfos.length }})</i>
+                        </div>
                     </div>
-                    
                 </el-card>
                 <!-- 文章列表 -->
-                <el-card class="tag-content" shadow="never">
-                    <!-- 博客摘要列表 -->
-                    <blogSummary shadow="never" class="blog-item"/>
-                    <blogSummary shadow="never" class="blog-item"/>
-                    <!-- 底部分页 -->
-                    <el-pagination
-                        background
-                        layout="prev, pager, next"
-                        :page-size="pageSize"
-                        :total="total">
-                    </el-pagination>
-                </el-card>
+                <!-- 博客摘要列表 -->
+                <blogSummary v-for="blogInfo in currentBlogInfos" 
+                :key="blogInfo.id" 
+                :blogInfo="blogInfo" 
+                shadow="never" 
+                class="blog-item"/>
             </el-card>
         </el-col>
         <el-col :span="6">
@@ -48,13 +43,55 @@ export default {
         generInfo,
         blogSummary
     },
+    created() {
+        this.getAllTags()
+    },
     data() {
         return {
-            pageSize: 4,
-            total: 10,
-            currentTag: 1,
+            currentTag: 0,
+            // 全部标签列表
+            tagList:[],
+            lastClickTagIndex: 0,
         }
     },
+    methods: {
+        // 获取所有标签
+        async getAllTags() {
+            const {data: res} = await this.$http.get('public/tags')
+            console.log(res)
+            if (res.meta.status === 200) {
+                this.tagList = res.data.filter( tag => {
+                    return tag.blogInfos.length !== 0
+                })
+            } else {
+                this.$message.error('获取标签数据失败！')
+            }
+        },
+        tagClick(event, index) {
+            console.log(this.$refs.tagItemRef)
+            // 给上一个被点击的元素恢复颜色
+            this.$refs.tagItemRef[this.lastClickTagIndex].style.color = "#77c5f8"
+            // 被点击的标签赋橙色
+            event.currentTarget.style.color = "#fc6423"
+            this.lastClickTagIndex = index
+            this.currentTag = index
+        }
+    },
+    computed: {
+        // 这里在前端实现一个数据分页的效果
+        currentBlogInfos() {
+            // 加判断的原因是等后台数据到达
+            if (this.tagList.length !== 0){
+                return this.tagList[this.currentTag].blogInfos
+            }
+        },
+        currentBlogInfosLength() {
+            // 加判断的原因是等后台数据到达
+            if (this.tagList.length !== 0) {
+                return this.tagList[this.currentTag].blogInfos.length
+            }
+        }
+    }
 }
 </script>
 
@@ -69,12 +106,25 @@ export default {
         color: #444950;
         margin-bottom: 20px;
     }
-    .tag-content{
-        .blog-item{
-            margin: 10px auto;
+    .tag-item{
+        color: #77c5f8;
+        display: inline-block;
+        margin: 15px;
+        cursor: pointer;
+        i{
+            font-size: 18px;
         }
-        .el-pagination{
-            text-align: center;
-        }
+    }
+    .tag-item:first-child{
+        color: #fc6423
+    }
+    .tag-item:hover{
+        color: #fc6423 !important;
+    }
+    .blog-item{
+        margin: 10px auto;
+    }
+    .el-pagination{
+        text-align: center;
     }
 </style>
