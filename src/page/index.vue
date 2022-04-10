@@ -23,8 +23,8 @@
                     <span slot="title">分类</span>
                 </el-menu-item>
                 <el-menu-item index="/tags">
-                    <i class="el-icon-price-tag"></i>
-                    <span slot="title">标签</span>
+                    <i class="iconfont icon-tags"></i>
+                    <span slot="title"> 标签</span>
                 </el-menu-item>
                 <el-menu-item index="/about">
                     <i class="el-icon-user-solid"></i>

@@ -3,10 +3,10 @@
     <!-- 右侧第一个卡片，显示网站基本信息 -->
     <el-card class="general-info">
         <div class="avatar">
-            <img :src="this.userInfo.avatar" alt="">
+            <img :src="userInfo.avatar" alt="">
         </div>
         <div class="moto">
-            所念皆星河
+            {{ userInfo.moto }}
         </div>
         <div class="social">
             <a href="https://github.com/xiaoqieF" target="_blank" class="social-item"><i class="iconfont icon-github"></i></a>

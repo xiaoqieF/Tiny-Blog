@@ -83,7 +83,7 @@
         width="50%"
         @close="handleModifyDialogClose">
             
-            <el-form :model="userInfo" :rules="userFormRules" ref="userFormRef" label-width="100px">
+            <el-form :model="userInfo" :rules="userFormRules" ref="userFormRef" label-width="130px">
                 <el-form-item label="用户名" prop="username">
                     <el-input disabled v-model="userInfo.username"></el-input>
                 </el-form-item>
@@ -95,6 +95,12 @@
                 </el-form-item>
                 <el-form-item label="邮箱" prop="email">
                     <el-input v-model="userInfo.email"></el-input>
+                </el-form-item>
+                <el-form-item label="座右铭" prop="moto">
+                    <el-input v-model="userInfo.moto"></el-input>
+                </el-form-item>
+                <el-form-item label="个人信息(请使用markdown格式)" prop="description">
+                    <el-input type="textarea" :rows="6" v-model="userInfo.description"></el-input>
                 </el-form-item>
             </el-form>
 
@@ -157,6 +163,12 @@ export default {
                 email: [
                     { required: true, message: '请输入邮箱', trigger: 'blur' },
                     {validator: checkEmail, trigger: 'blur'},
+                ],
+                moto: [
+                    { required: true, message: '请输入座右铭', trigger: 'blur' },
+                ],
+                description: [
+                    { required: true, message: '请输入个人描述', trigger: 'blur' },
                 ],
             },
             // 上传用户头像对话框
