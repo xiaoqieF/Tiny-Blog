@@ -14,7 +14,7 @@ module.exports = {
     [
       'prismjs', 
       {
-        'languages': ['javascript', 'css', 'markup', 'python', 'html', 'java'],
+        'languages': ['javascript', 'css', 'markup', 'python', 'html', 'java', 'c', 'cpp', 'cmake', 'git'],
         'plugins': ['line-numbers'],
         'theme': 'okaidia',
         'css': true

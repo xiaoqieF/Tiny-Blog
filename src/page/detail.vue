@@ -15,7 +15,7 @@
                     <div><i class="el-icon-view"></i><span> 阅读次数 {{ blog.views }}</span></div>
                 </div>
                 <!-- 文章内容 -->
-                <div ref="contentRef" id="content" class="content markdown-body" v-html="blog.content"></div>
+                <div ref="contentRef" id="content" class="content markdown-body line-numbers" v-html="blog.content"></div>
                 <div class="thanks">
                     ----- 本文结束，感谢您的阅读 -----
                 </div>
