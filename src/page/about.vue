@@ -2,10 +2,6 @@
     <el-row class="container" :gutter="20">
         <el-col :span="18">
             <el-card>
-                <!-- 文章标题 -->
-                <div class="title">
-                    Spring框架(三):动态代理和AOP
-                </div>
                 <!-- 文章内容 -->
                 <div class="content">
                     <p>这是内容！</p>

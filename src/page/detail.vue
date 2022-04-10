@@ -22,7 +22,8 @@
                 <!-- 底部声明栏 -->
                 <el-card shadow="never" class="footer">
                     <div class="author">
-                        <span>本文作者：</span><a href="https://github.com/xiaoqieF">{{ blog.user.nickname }}</a>
+                        <!-- 这里确保能够拿到数据，因为向服务器获取数据需要时间 -->
+                        <span>本文作者：</span><a href="https://github.com/xiaoqieF">{{ blog.user ? blog.user.nickname:"" }}</a>
                     </div>
                     <div class="copyright">
                         <span>版权声明：</span>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en">BY-NC-SA</a> 许可协议。转载请注明出处！
