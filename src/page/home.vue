@@ -71,6 +71,7 @@ export default {
             blogQuery: {
                 pageNum: 1,
                 pageSize: 5,
+                searchWords: '',
             },
             totalBlogs: 0,
             pageSize: 10,
@@ -116,8 +117,15 @@ export default {
             this.blogQuery.pageNum = newPage
             this.getAllBlogs()
         },
+        // 触发全局搜索
+        handleSearch(searchInfo) {
+            console.log('收到search：',searchInfo)
+            this.blogQuery.searchWords = searchInfo
+            this.getAllBlogs()
+        }
     },
     mounted() {
+        // 监测标签墙宽度变化，使得长宽比保持不变
         const resizeObserver = new ResizeObserver(entries => {
             for (let entry of entries) {
                 this.tagWallWidth = entry.target.clientWidth
@@ -125,7 +133,13 @@ export default {
             }
         });
         resizeObserver.observe(document.querySelector('.tag-content'));
-        },
+
+        // 通过全局事件总线接收搜索事件
+        this.$bus.$on('search', this.handleSearch)
+    },
+    beforeDestroy() {
+        this.$bus.$off('search')
+    },
 }
 </script>
 

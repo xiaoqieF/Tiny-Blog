@@ -32,10 +32,10 @@
                 </el-menu-item>
                 </el-menu>
             </el-col>
-            <!-- 全局搜索 -->
-            <el-col :span="4" class="global_search">
-                 <el-input placeholder="请输入内容" v-model="serachInfo" class="input-with-select">
-                    <el-button slot="append" icon="el-icon-search"></el-button>
+            <!-- 全局搜索，只在首页出现 -->
+            <el-col v-if="$route.path === '/home'" :span="4" class="global_search">
+                 <el-input placeholder="请输入内容" v-model="searchInfo" class="input-with-select" @keyup.enter.native="globalSearch">
+                    <el-button slot="append" icon="el-icon-search" @click="globalSearch"></el-button>
                 </el-input>
             </el-col>
         </el-row>
@@ -68,11 +68,11 @@
                 </el-col>
                 <el-col :span="12" class="about">
                     <div class="small-title">Blog</div>
-                    <div>这是 <el-link href="#">小切</el-link> 的个人博客，用于分享学习笔记和个人心得。内容主要关于前后端开发、编程基础知识等。希望阅读的朋友能有所收获。</div>
+                    <div>这是 <router-link class="foot-link" to="/about">小切</router-link> 的个人博客，用于分享学习笔记和个人心得。内容主要关于前后端开发、编程基础知识等。希望阅读的朋友能有所收获。</div>
                 </el-col>
             </el-row>
             <div class="copyright">
-                <span>Copyright © 2021~2022 | </span> <el-link target="_blank" href="https://beian.miit.gov.cn/#/Integrated/index">京ICP备2021039158号-1</el-link>
+                <span>Copyright © 2021~2022 | </span> <el-link class="foot-link" target="_blank" href="https://beian.miit.gov.cn/#/Integrated/index">京ICP备2021039158号-1</el-link>
             </div>
             <div>
                 <span>Designed by 小切</span>
@@ -96,7 +96,7 @@ export default {
         return {
             activeIndex: '',
             // 全局搜索框内容
-            serachInfo: '',
+            searchInfo: '',
             // 滚动页面所处高度
             lastHeight: 0,
             navClass: 'header-nav-top',
@@ -116,11 +116,17 @@ export default {
                 this.navClass = 'header-nav-top'
             }
             this.lastHeight = height
+        },
+        // 全局搜索
+        globalSearch() {
+            this.$bus.$emit('search', this.searchInfo)
         }
     },
     watch: {
+        // 路由路径变化的时候将当前激活的导航item改变，以及将当前的搜索框清空
         '$route.path': function(val) {
             this.activeIndex = val
+            this.searchInfo = ''
         }
     }
 }
@@ -187,7 +193,7 @@ export default {
         background-color: #333;
         color: #aaa;
         font-size: 16px;
-        .el-link{
+        .foot-link{
             font-size: 16px;
             color: rgb(243, 75, 75);
         }

@@ -52,12 +52,15 @@
             const {data: res} = await this.$http.get('public/tags')
             console.log(res)
             if (res.meta.status === 200) {
-                this.tagList = res.data
+                this.tagList = res.data.filter( tag => {
+                  return tag.blogInfos.length !== 0
+                })
             } else {
                 this.$message.error('获取标签数据失败！')
             }
         },
       rotateX(angleX){
+        // 解注释以实现纵向旋转
         // var cos = Math.cos(angleX);
         // var sin = Math.sin(angleX);
         // for(let tag of this.tags){
