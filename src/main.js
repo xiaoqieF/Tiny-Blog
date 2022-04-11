@@ -60,7 +60,7 @@ const renderOption = {
   throwOnError : false
 }
 
-// 挂载自动渲染函数到vue原型
+// 挂载公式自动渲染函数到vue原型
 Vue.prototype.$formula = function (dom) {
   renderMathInElement(dom, renderOption)
 }

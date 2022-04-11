@@ -174,7 +174,8 @@ export default {
             // 上传用户头像对话框
             uploadDialogVisible: false,
             // 头像上传地址
-            uploadUrl: 'http://localhost:8082/private/user/upload',
+            uploadUrl: this.$http.defaults.baseURL + 'private/user/upload',
+            // uploadUrl: 'http://localhost:8082/private/user/upload',
             // 头像上传时添加token头部
             uploadHeader: {
                 Authorization: window.sessionStorage.getItem('token')

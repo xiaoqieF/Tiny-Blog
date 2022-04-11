@@ -103,7 +103,8 @@ export default {
             blog: {},
             fileList:[],
             // 文件上传地址
-            uploadUrl: "http://localhost:8082/private/blog/upload",
+            uploadUrl: this.$http.defaults.baseURL + 'private/blog/upload',
+            // uploadUrl: "http://localhost:8082/private/blog/upload",
             // 上传文件时的头部
             uploadHeader: {
                 Authorization: window.sessionStorage.getItem('token')
